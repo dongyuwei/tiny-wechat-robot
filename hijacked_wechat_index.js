@@ -1,3 +1,5 @@
+console.log('### wechat index js hijacked ###');
+
 webpackJsonp([1], [function(e, exports, t) {
     e.exports = t(262) + t(277);
 }, , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , function(e, exports, t) {
@@ -1998,6 +2000,7 @@ webpackJsonp([1], [function(e, exports, t) {
                         e.MMStatus = confFactory.MSG_SEND_STATUS_SENDING, this.messageProcess(e)
                     },
                     sendMessage: function(e) {
+                        console.log('### sendMessage:', e, JSON.stringify(e, null, 3))
                         switch (e.MMStatus = confFactory.MSG_SEND_STATUS_SENDING, e.MsgType) {
                             case confFactory.MSGTYPE_TEXT:
                                 this.postTextMessage(e);
@@ -2145,6 +2148,7 @@ webpackJsonp([1], [function(e, exports, t) {
                         return a.length ? a[a.length - 1] : {}
                     },
                     addChatMessage: function(e) {
+                        console.info('### got new message: ', JSON.stringify(e, null, 3))
                         if (e) {
                             var t = this,
                                 a = (e.FromUserName, e.ToUserName, _chatMessages[e.MMPeerUserName] || (_chatMessages[e.MMPeerUserName] = []));
