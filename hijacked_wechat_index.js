@@ -1,4 +1,39 @@
+///====================== start of injected code =============================\\\
 console.log('### wechat index js hijacked ###');
+
+function pingPongRobot (receivedMessage) {
+    console.log('### reveived message, processing it ', JSON.stringify(receivedMessage, null, 3));
+
+    var myName = $('.header .avatar').scope().account.UserName;
+    var content = receivedMessage.Content.trim().toLowerCase();
+    if (receivedMessage.FromUserName !== myName) {
+        var toUser = window._contacts[receivedMessage.FromUserName].NickName;
+        switch (content) {
+            case 'ping':
+                replyTo(toUser, 'pong');
+                break;
+            case 'pingping':
+                replyTo(toUser, 'pongpong');
+                break;
+            case 'pingpingping':
+                replyTo(toUser, 'pongpongpong');
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+function replyTo (toUser, message) {
+    $('#search_bar .frm_search').val(toUser).trigger('input');
+    setTimeout(function(){
+        $('.contacts.scrollbar-dynamic.scroll-content  .contact_item.on').trigger('click');
+        $('#editArea').html(message).trigger('input');
+        $('.action .btn.btn_send').click();
+    }, 100);
+}
+
+///====================== end of injected code =============================///
 
 webpackJsonp([1], [function(e, exports, t) {
     e.exports = t(262) + t(277);
@@ -2000,7 +2035,6 @@ webpackJsonp([1], [function(e, exports, t) {
                         e.MMStatus = confFactory.MSG_SEND_STATUS_SENDING, this.messageProcess(e)
                     },
                     sendMessage: function(e) {
-                        console.log('### sendMessage:', e, JSON.stringify(e, null, 3))
                         switch (e.MMStatus = confFactory.MSG_SEND_STATUS_SENDING, e.MsgType) {
                             case confFactory.MSGTYPE_TEXT:
                                 this.postTextMessage(e);
@@ -2148,7 +2182,7 @@ webpackJsonp([1], [function(e, exports, t) {
                         return a.length ? a[a.length - 1] : {}
                     },
                     addChatMessage: function(e) {
-                        console.info('### got new message: ', JSON.stringify(e, null, 3))
+                        // console.log('### new conversation message: ', JSON.stringify(e, null, 3))
                         if (e) {
                             var t = this,
                                 a = (e.FromUserName, e.ToUserName, _chatMessages[e.MMPeerUserName] || (_chatMessages[e.MMPeerUserName] = []));
@@ -2198,6 +2232,9 @@ webpackJsonp([1], [function(e, exports, t) {
                         return this.setCurrentUnread(e, 0), a
                     },
                     messageProcess: function(e) {
+                        ///-------------------------\\\
+                        pingPongRobot(e);
+                        ///-------------------------///
                         var t = this,
                             a = contactFactory.getContact(e.FromUserName, "", !0);
                         if (!a || a.isMuted() || a.isSelf() || a.isShieldUser() || a.isBrandContact() || titleRemind.increaseUnreadMsgNum(), e.MMPeerUserName = t._getMessagePeerUserName(e), e.MsgType == confFactory.MSGTYPE_STATUSNOTIFY) return void t._statusNotifyProcessor(e);
