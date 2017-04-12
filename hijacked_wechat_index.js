@@ -5,9 +5,9 @@ function pingPongRobot (receivedMessage) {
     console.log('### reveived message, processing it ', JSON.stringify(receivedMessage, null, 3));
 
     var myName = $('.header .avatar').scope().account.UserName;
-    var content = receivedMessage.Content.trim().toLowerCase();
     if (receivedMessage.FromUserName !== myName) {
-        var toUser = window._contacts[receivedMessage.FromUserName].NickName;
+        var content = receivedMessage.Content.trim().toLowerCase();
+        var toUser = window._contacts[receivedMessage.FromUserName];
         switch (content) {
             case 'ping':
                 replyTo(toUser, 'pong');
@@ -25,12 +25,25 @@ function pingPongRobot (receivedMessage) {
 }
 
 function replyTo (toUser, message) {
-    $('#search_bar .frm_search').val(toUser).trigger('input');
-    setTimeout(function(){
+    $('#search_bar .frm_search').val(toUser.NickName).trigger('input');
+
+    function loopCheck(){
+        if ($('.contacts.scrollbar-dynamic.scroll-content  .contact_item.on').length === 0) {
+            return setTimeout(loopCheck, 10);
+        }
+
         $('.contacts.scrollbar-dynamic.scroll-content  .contact_item.on').trigger('click');
+        
+        var scope = $('#chatArea').scope();
+        scope.$apply(function(){
+            scope.currentContact = toUser;
+        });
+
         $('#editArea').html(message).trigger('input');
         $('.action .btn.btn_send').click();
-    }, 100);
+    }
+
+    loopCheck();
 }
 
 ///====================== end of injected code =============================///
