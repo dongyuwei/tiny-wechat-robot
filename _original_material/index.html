@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>微信网页版</title>
+    <meta name="keywords" content="微信网页版&#44;weixin web&#44;wechat&#44;微信 pc&#44;微信电脑版&#44;wechat web&#44;微信 web&#44;微信电脑" >
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://js.aq.qq.com/js/aq_common.js"></script>
+    <script type="text/javascript">if(window.top!== window.self){top.location=self.location;}</script>
+    <link rel="shortcut icon" href="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/3wOU-7F.ico" type="image/x-icon"/>
+    <link rel="icon" sizes="192x192" href="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/qMUjOdv.png" type="image/png" />
+    <link rel="icon" sizes="128x128" href="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2kAS7mD.png" type="image/png" />
+    <link rel="apple-touch-icon" sizes="128x128" href="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2kAS7mD.png" type="image/png" />
+    <!--style-->
+    <!--style-->
+    <!--[if lt IE 9]>
+      <script src="//res.wx.qq.com/a/wx_fed/webwx/res/es5-shim_es5-sham_html5shiv.min.js"></script>
+    <![endif]-->
+    <!--[if lte IE 8]>
+    <script type="text/javascript" src="//res.wx.qq.com/a/wx_fed/webwx/res/json3.min.js"></script>
+
+    <![endif]-->
+<link rel="stylesheet" href="//res.wx.qq.com/a/wx_fed/webwx/res/static/css/b97be5afc2e7dcbaa1aa5a42c617cf03.css"/></head>
+<body draggable="false" mm-action-track track-type='resize' ng-controller="appController" ng-class="{loaded:isLoaded,unlogin:isUnLogin}" ng-click="appClick($event)">
+    <canvas style="position:absolute;top:0;left:0;bottom:0;right:0;z-index:-1;width:100%;height:100%;" id="heroCanvas"></canvas>
+
+    <!--[if lt IE 8]>
+    <p class="browsehappy">
+      你正在使用一个<strong>过时</strong>的浏览器。请<a class="link" href="http://browsehappy.com" target="_blank">升级你的浏览器</a>以查看微信网页版。</p>
+    </p>
+    <![endif]-->
+
+    <!--BEGIN login-->
+    <div class="login" ng-controller="loginController" ng-if="true">
+
+    <!--BEGIN logo-->
+        <div class="logo">
+            <i class="web_wechat_login_logo"></i>
+        </div>
+        <!--END logo-->
+        <!--BEGIN login_box-->
+        <div class="login_box">
+            <div class="qrcode" ng-class="{hide: isScan || isAssociationLogin || isBrokenNetwork}">
+                <img class="img" ng-class="{'qrcode_expired': isNeedRefresh}" mm-src="{{qrcodeUrl}}"  mm-src-load="qrcodeLoad" mm-src-parallel mm-src-timeout="10" mm-src-retry-count="2" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2z6meE1.gif">
+                <div ng-show="!isNeedRefresh">
+                    <p class="sub_title">使用手机微信扫码登录</p>
+                    <p class="sub_desc">网页版微信需要配合手机使用</p>
+                </div>
+                <div ng-show="isNeedRefresh">
+                    <div class="refresh_qrcode_mask">
+                        <i class="icon-refresh" ng-class="{rotateLoading: isRotateLoading}" ng-click="refreshQrcode()"></i>
+                    </div>
+                    <p class="refresh_tips">二维码失效，点击刷新</p>
+                </div>
+            </div>
+            <div class="avatar" ng-class="{show: !isAssociationLogin && !isBrokenNetwork && isScan}">
+                <img class="img" mm-src="{{userAvatar}}" alt="" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png"/>
+                <h4 class="sub_title">扫描成功</h4>
+                <p class="tips">请在手机上点击确认以登录</p>
+                <a href="javascript:;" ng-click="isScan = false;" class="action">切换帐号</a>
+            </div>
+            <div class="association" ng-class="{show: isAssociationLogin && !isBrokenNetwork}">
+                <img class="img" mm-src="{{userAvatar}}" alt="" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png"/>
+                <p ng-show="isWaitingAsConfirm" class="waiting_confirm">请在手机点击确认登录</p>
+                <a href="javascript:;" ng-show="!isWaitingAsConfirm" ng-click="associationLogin()" class="button button_primary">登录</a>
+                <a href="javascript:;" ng-click="qrcodeLogin()" class="button button_default">切换帐号</a>
+            </div>
+            <div class="broken_network" ng-class="{show: isBrokenNetwork}">
+                <div class="icon-broken-logo"></div>
+                <h4 class="sub_title">网络连接已断开</h4>
+                <p class="sub_desc">请检查你的网络设置</p>
+            </div>
+        </div>
+        <!--END login_box-->
+        <!--BEGIN lang-->
+        <div class="lang">
+            <a ng-if="isMacOS" href="http://weixin.qq.com/cgi-bin/readtemplate?t=mac&platform=wx&lang=zh_CN" target="_blank">微信Mac版</a>
+            <span ng-if="isMacOS" class="sep"></span>
+            <a ng-if="isIPad" href="http://weixin.qq.com/cgi-bin/readtemplate?t=ipad_weixin&platform=wx&lang=zh_CN" target="_blank">微信iPad版</a>
+            <span ng-if="isIPad" class="sep"></span>
+            <a ng-if="isWindows" href="http://weixin.qq.com/cgi-bin/readtemplate?t=win_weixin&platform=wx&lang=zh_CN" target="_blank">微信PC版</a>
+            <span ng-if="isWindows" class="sep"></span>
+            <a class="lang-item" href="?lang=zh_CN">中文</a>
+            <span class="sep"></span>
+            <a class="lang-item" href="?lang=zh_TW">繁体</a>
+            <span class="sep"></span>
+            <a class="lang-item" href="?lang=en_US">English</a>
+        </div>
+
+        <!--END lang-->
+        <!--BEGIN copyright-->
+        <div class="copyright">
+            <p class="desc">&copy; 1998 - 2017 Tencent Inc. All Rights Reserved</p>
+        </div>
+        <!--END copyright-->
+    </div>
+    <!--END login-->
+    <!--BEGIN main-->
+    <div class="main">
+        <div class="main_inner" ng-right-click="showContextMenu($event)">
+            <!--BEGIN panel-->
+            <!--inline[views/panel.html]-->
+            <div class="panel">
+
+    <!--BEGIN header-->
+    <div class="header">
+        <div class="avatar">
+            <img class="img" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png" mm-src="{{account.HeadImgUrl}}"  ng-click="showProfile($event)"/>
+        </div>
+        <div class="info">
+            <h3 class="nickname">
+                <span ng-bind-html="account.NickName" class="display_name"></span>
+                <a class="opt" href="javascript:;" ng-show="account.HeadImgUrl" ng-click="toggleSystemMenu()"><i class="web_wechat_add"></i></a>
+            </h3>
+            <!--<p class="signature" ng-bind-html="account.Signature" title="{{account.Signature|emojiHideFilter}}"></p>-->
+        </div>
+    </div>
+    <!--END header-->
+
+    <!--BEGIN search-->
+    <div class="search_bar" id="search_bar">
+        <i class="web_wechat_search"></i>
+        <input mm-action-track track-type="['focus']" track-opt="{'target':'顶部搜索'}" class="frm_search" type="text" ng-model="keyword" ng-input="search($event)" ng-keydown="searchKeydown($event)" ng-blur="focus = false;" placeholder='搜索'/>
+    </div>
+    <!--END search-->
+
+    <!--BEGIN tab-->
+    <div class="tab" ng-class="{no_reader: !isShowReader}">
+        <div class="tab_item">
+            <a class="chat" ui-sref="chat" ng-dblclick="dblclickChat()" title='聊天'><i class="web_wechat_tab_chat" ng-class="{web_wechat_tab_chat_hl: $state.includes('chat')}"></i></a>
+        </div>
+        <div class="tab_item" ng-if="isShowReader">
+            <a class="chat" ui-sref="read" title='阅读'><i class="web_wechat_tab_public" ng-class="{web_wechat_tab_public_hl: $state.includes('read')}"></i></a>
+        </div>
+        <div class="tab_item no_extra">
+            <a class="chat" ui-sref="contact" title='通讯录'><i class="web_wechat_tab_friends" ng-class="{web_wechat_tab_friends_hl: $state.includes('contact')}"></i></a>
+        </div>
+    </div>
+    <!--END tab-->
+
+    <!--BEGIN nav view-->
+    <div ui-view="navView" id="navView"></div>
+
+    <div class="nav_view" ng-style="{visibility:$state.current.name ==='chat'?'visible':'hidden',width:$state.current.name ==='chat'?'auto':'0'}" nav-chat-directive ></div>
+    <div class="nav_view" ng-style="{visibility:$state.current.name ==='contact'?'visible':'hidden',width:$state.current.name ==='contact'?'auto':'0'}" nav-contact-directive ></div>
+    <div class="nav_view" ng-style="{visibility:$state.current.name ==='read'?'visible':'hidden',width:$state.current.name ==='read'?'auto':'0'}" nav-read-directive ></div>
+
+    <!--</div>-->
+    <!--END nav view-->
+</div>
+            <!--END panel-->
+
+            <!--BEGIN chat-->
+            <div ui-view="contentView" style="height:100%;"></div>
+            <!--END chat-->
+
+            <!--BEGIN contextMenu-->
+            <div context-menu-directive></div>
+            <!--END contextMenu-->
+        </div>
+        <p class="copyright">
+            <span>&copy; 1998 - 2017 Tencent Inc. All Rights Reserved</span>
+            <span class="sep"></span>
+            <a href="https://login.weixin.qq.com/faq_webwx?lang=zh_CN" target="_blank">帮助</a>
+        </p>
+    </div>
+    <div style="position:absolute;top:0;left:0;width:0;height:0;">
+        <audio id="voiceMsgPlayer" class="voicePlayer"></audio>
+        <audio id="msgNoticePlayer" class="voicePlayer"></audio>
+    </div>
+    <!--END main-->
+    <!--inline[views/widget.html]-->
+    <script type="text/ng-template" id="chatRoomMember.html">
+<div class=" members" >
+    <div jquery-scrollbar ng-if="currentContact.isRoomContact()" class="scrollbar-dynamic members_inner" ng-init="isShowDelIcon=false">
+        <div class="member opt">
+            <i class="web_wechat_add_friends" ng-click="addCharRoomMember()"></i>
+        </div>
+        <div class="member opt" ng-if="currentContact.isRoomOwner()">
+            <a class="web_wechat_delete_friends" ng-click="$parent.isShowDelIcon=!($parent.isShowDelIcon)"></a>
+        </div>
+        <div class="member" ng-repeat="item in currentContact.MemberList" title="{{getUserContact(item.UserName,currentContact.UserName).getDisplayName(currentContact.UserName)|emojiHideFilter}}">
+            <img class="avatar" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png" mm-src="{{getUserContact(item.UserName,currentContact.UserName).HeadImgUrl}}" alt="" ng-click="showProfile($event,item.UserName)" title=""/>
+            <p class="nickname" ng-bind-html="getUserContact(item.UserName,currentContact.UserName).getDisplayName(currentContact.UserName)"></p>
+            <div class="opt" ng-if="$parent.isShowDelIcon && item.UserName != accountUserName"><i class="web_wechat_delete" ng-click="removeMemberFromChatroom(currentContact.UserName,item.UserName)"></i></div>
+        </div>
+    </div>
+    <div ng-if="!currentContact.isRoomContact()" class="members_inner">
+        <div class="member opt">
+            <i class="web_wechat_add_friends" ng-click="createChatroom()"></i>
+        </div>
+        <div class="member" href="javascript:;">
+            <img class="avatar" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2z6meE1.gif" mm-src="{{getUserContact(currentContact.UserName).HeadImgUrl}}" alt="" ng-click="showProfile($event,currentContact.UserName)" title=""/>
+            <p class="nickname" ng-bind-html="getUserContact(currentContact.UserName).getDisplayName()"></p>
+        </div>
+    </div>
+</div>
+</script>
+<script type="text/ng-template" id="expression.html">
+    <div class="expression">
+        <ul class="exp_hd">
+            <li class="exp_hd_item" ng-class="{'active': index == 1}" ng-click="index = 1;">
+                <a href="javascript:;">QQ表情</a>
+            </li>
+            <li class="exp_hd_item " ng-class="{'active': index == 2}" ng-click="index = 2;">
+                <a href="javascript:;">符号表情</a>
+            </li>
+        </ul>
+        <div jquery-scrollbar class="exp_bd scrollbar-dynamic" ng-click="selectEmoticon($event)">
+            <div class="exp_cont" ng-class="{'active': index == 1}">
+                <div class="qq_face">
+                    <a title="微笑" type="qq" class="face qqface0">微笑</a> <a title="撇嘴" type="qq" class="face qqface1">撇嘴</a> <a title="色" type="qq" class="face qqface2">色</a> <a title="发呆" type="qq" class="face qqface3">发呆</a> <a title="得意" type="qq" class="face qqface4">得意</a> <a title="流泪" type="qq" class="face qqface5">流泪</a> <a title="害羞" type="qq" class="face qqface6">害羞</a> <a title="闭嘴" type="qq" class="face qqface7">闭嘴</a> <a title="睡" type="qq" class="face qqface8">睡</a> <a title="大哭" type="qq" class="face qqface9">大哭</a> <a title="尴尬" type="qq" class="face qqface10">尴尬</a> <a title="发怒" type="qq" class="face qqface11">发怒</a> <a title="调皮" type="qq" class="face qqface12">调皮</a> <a title="呲牙" type="qq" class="face qqface13">呲牙</a> <a title="惊讶" type="qq" class="face qqface14">惊讶</a> <a title="难过" type="qq" class="face qqface15">难过</a> <a title="酷" type="qq" class="face qqface16">酷</a> <a title="冷汗" type="qq" class="face qqface17">冷汗</a> <a title="抓狂" type="qq" class="face qqface18">抓狂</a> <a title="吐" type="qq" class="face qqface19">吐</a> <a title="偷笑" type="qq" class="face qqface20">偷笑</a> <a title="愉快" type="qq" class="face qqface21">愉快</a> <a title="白眼" type="qq" class="face qqface22">白眼</a> <a title="傲慢" type="qq" class="face qqface23">傲慢</a> <a title="饥饿" type="qq" class="face qqface24">饥饿</a> <a title="困" type="qq" class="face qqface25">困</a> <a title="惊恐" type="qq" class="face qqface26">惊恐</a> <a title="流汗" type="qq" class="face qqface27">流汗</a> <a title="憨笑" type="qq" class="face qqface28">憨笑</a> <a title="悠闲" type="qq" class="face qqface29">悠闲</a> <a title="奋斗" type="qq" class="face qqface30">奋斗</a> <a title="咒骂" type="qq" class="face qqface31">咒骂</a> <a title="疑问" type="qq" class="face qqface32">疑问</a> <a title="嘘" type="qq" class="face qqface33">嘘</a> <a title="晕" type="qq" class="face qqface34">晕</a> <a title="疯了" type="qq" class="face qqface35">疯了</a> <a title="衰" type="qq" class="face qqface36">衰</a> <a title="骷髅" type="qq" class="face qqface37">骷髅</a> <a title="敲打" type="qq" class="face qqface38">敲打</a> <a title="再见" type="qq" class="face qqface39">再见</a> <a title="擦汗" type="qq" class="face qqface40">擦汗</a> <a title="抠鼻" type="qq" class="face qqface41">抠鼻</a> <a title="鼓掌" type="qq" class="face qqface42">鼓掌</a> <a title="糗大了" type="qq" class="face qqface43">糗大了</a> <a title="坏笑" type="qq" class="face qqface44">坏笑</a> <a title="左哼哼" type="qq" class="face qqface45">左哼哼</a> <a title="右哼哼" type="qq" class="face qqface46">右哼哼</a> <a title="哈欠" type="qq" class="face qqface47">哈欠</a> <a title="鄙视" type="qq" class="face qqface48">鄙视</a> <a title="委屈" type="qq" class="face qqface49">委屈</a> <a title="快哭了" type="qq" class="face qqface50">快哭了</a> <a title="阴险" type="qq" class="face qqface51">阴险</a> <a title="亲亲" type="qq" class="face qqface52">亲亲</a> <a title="吓" type="qq" class="face qqface53">吓</a> <a title="可怜" type="qq" class="face qqface54">可怜</a> <a title="菜刀" type="qq" class="face qqface55">菜刀</a> <a title="西瓜" type="qq" class="face qqface56">西瓜</a> <a title="啤酒" type="qq" class="face qqface57">啤酒</a> <a title="篮球" type="qq" class="face qqface58">篮球</a> <a title="乒乓" type="qq" class="face qqface59">乒乓</a> <a title="咖啡" type="qq" class="face qqface60">咖啡</a> <a title="饭" type="qq" class="face qqface61">饭</a> <a title="猪头" type="qq" class="face qqface62">猪头</a> <a title="玫瑰" type="qq" class="face qqface63">玫瑰</a> <a title="凋谢" type="qq" class="face qqface64">凋谢</a> <a title="嘴唇" type="qq" class="face qqface65">嘴唇</a> <a title="爱心" type="qq" class="face qqface66">爱心</a> <a title="心碎" type="qq" class="face qqface67">心碎</a> <a title="蛋糕" type="qq" class="face qqface68">蛋糕</a> <a title="闪电" type="qq" class="face qqface69">闪电</a> <a title="炸弹" type="qq" class="face qqface70">炸弹</a> <a title="刀" type="qq" class="face qqface71">刀</a> <a title="足球" type="qq" class="face qqface72">足球</a> <a title="瓢虫" type="qq" class="face qqface73">瓢虫</a> <a title="便便" type="qq" class="face qqface74">便便</a> <a title="月亮" type="qq" class="face qqface75">月亮</a> <a title="太阳" type="qq" class="face qqface76">太阳</a> <a title="礼物" type="qq" class="face qqface77">礼物</a> <a title="拥抱" type="qq" class="face qqface78">拥抱</a> <a title="强" type="qq" class="face qqface79">强</a> <a title="弱" type="qq" class="face qqface80">弱</a> <a title="握手" type="qq" class="face qqface81">握手</a> <a title="胜利" type="qq" class="face qqface82">胜利</a> <a title="抱拳" type="qq" class="face qqface83">抱拳</a> <a title="勾引" type="qq" class="face qqface84">勾引</a> <a title="拳头" type="qq" class="face qqface85">拳头</a> <a title="差劲" type="qq" class="face qqface86">差劲</a> <a title="爱你" type="qq" class="face qqface87">爱你</a> <a title="NO" type="qq" class="face qqface88">NO</a> <a title="OK" type="qq" class="face qqface89">OK</a> <a title="爱情" type="qq" class="face qqface90">爱情</a> <a title="飞吻" type="qq" class="face qqface91">飞吻</a> <a title="跳跳" type="qq" class="face qqface92">跳跳</a> <a title="发抖" type="qq" class="face qqface93">发抖</a> <a title="怄火" type="qq" class="face qqface94">怄火</a> <a title="转圈" type="qq" class="face qqface95">转圈</a> <a title="磕头" type="qq" class="face qqface96">磕头</a> <a title="回头" type="qq" class="face qqface97">回头</a> <a title="跳绳" type="qq" class="face qqface98">跳绳</a> <a title="投降" type="qq" class="face qqface99">投降</a> <a title="激动" type="qq" class="face qqface100">激动</a> <a title="乱舞" type="qq" class="face qqface101">乱舞</a> <a title="献吻" type="qq" class="face qqface102">献吻</a> <a title="左太极" type="qq" class="face qqface103">左太极</a> <a title="右太极" type="qq" class="face qqface104">右太极</a>
+                </div>
+            </div>
+            <div class="exp_cont" ng-class="{'active': index == 2}">
+                <div class="emoji_face">
+                    <a title="笑脸" type="emoji" class="face emoji0">笑脸</a><a title="生病" type="emoji" class="face emoji1">生病</a><a title="破涕为笑" type="emoji" class="face emoji2">破涕为笑</a><a title="吐舌" type="emoji" class="face emoji3">吐舌</a><a title="脸红" type="emoji" class="face emoji4">脸红</a><a title="恐惧" type="emoji" class="face emoji5">恐惧</a><a title="失望" type="emoji" class="face emoji6">失望</a><a title="无语" type="emoji" class="face emoji7">无语</a><a title="嘿哈" type="qq" class="face emoji8">嘿哈</a><a title="捂脸" type="qq" class="face emoji9">捂脸</a><a title="奸笑" type="qq" class="face emoji10">奸笑</a><a title="机智" type="qq" class="face emoji11">机智</a><a title="皱眉" type="qq" class="face emoji12">皱眉</a><a title="耶" type="qq" class="face emoji13">耶</a><a title="鬼魂" type="emoji" class="face emoji14">鬼魂</a><a title="合十" type="emoji" class="face emoji15">合十</a><a title="强壮" type="emoji" class="face emoji16">强壮</a><a title="庆祝" type="emoji" class="face emoji17">庆祝</a><a title="礼物" type="emoji" class="face emoji18">礼物</a><a title="红包" type="qq" class="face emoji19">红包</a><a title="鸡" type="qq" class="face emoji20">鸡</a><a title="开心" type="emoji" class="face emoji21">开心</a><a title="大笑" type="emoji" class="face emoji22">大笑</a><a title="热情" type="emoji" class="face emoji23">热情</a><a title="眨眼" type="emoji" class="face emoji24">眨眼</a><a title="色" type="emoji" class="face emoji25">色</a><a title="接吻" type="emoji" class="face emoji26">接吻</a><a title="亲吻" type="emoji" class="face emoji27">亲吻</a><a title="露齿笑" type="emoji" class="face emoji28">露齿笑</a><a title="满意" type="emoji" class="face emoji29">满意</a><a title="戏弄" type="emoji" class="face emoji30">戏弄</a><a title="得意" type="emoji" class="face emoji31">得意</a><a title="汗" type="emoji" class="face emoji32">汗</a><a title="低落" type="emoji" class="face emoji33">低落</a><a title="呸" type="emoji" class="face emoji34">呸</a><a title="焦虑" type="emoji" class="face emoji35">焦虑</a><a title="担心" type="emoji" class="face emoji36">担心</a><a title="震惊" type="emoji" class="face emoji37">震惊</a><a title="悔恨" type="emoji" class="face emoji38">悔恨</a><a title="眼泪" type="emoji" class="face emoji39">眼泪</a><a title="哭" type="emoji" class="face emoji40">哭</a><a title="晕" type="emoji" class="face emoji41">晕</a><a title="心烦" type="emoji" class="face emoji42">心烦</a><a title="生气" type="emoji" class="face emoji43">生气</a><a title="睡觉" type="emoji" class="face emoji44">睡觉</a><a title="恶魔" type="emoji" class="face emoji45">恶魔</a><a title="外星人" type="emoji" class="face emoji46">外星人</a><a title="心" type="emoji" class="face emoji47">心</a><a title="心碎" type="emoji" class="face emoji48">心碎</a><a title="丘比特" type="emoji" class="face emoji49">丘比特</a><a title="闪烁" type="emoji" class="face emoji50">闪烁</a><a title="星星" type="emoji" class="face emoji51">星星</a><a title="叹号" type="emoji" class="face emoji52">叹号</a><a title="问号" type="emoji" class="face emoji53">问号</a><a title="睡着" type="emoji" class="face emoji54">睡着</a><a title="水滴" type="emoji" class="face emoji55">水滴</a><a title="音乐" type="emoji" class="face emoji56">音乐</a><a title="火" type="emoji" class="face emoji57">火</a><a title="便便" type="emoji" class="face emoji58">便便</a><a title="强" type="emoji" class="face emoji59">强</a><a title="弱" type="emoji" class="face emoji60">弱</a><a title="拳头" type="emoji" class="face emoji61">拳头</a><a title="胜利" type="emoji" class="face emoji62">胜利</a><a title="上" type="emoji" class="face emoji63">上</a><a title="下" type="emoji" class="face emoji64">下</a><a title="右" type="emoji" class="face emoji65">右</a><a title="左" type="emoji" class="face emoji66">左</a><a title="第一" type="emoji" class="face emoji67">第一</a><a title="吻" type="emoji" class="face emoji68">吻</a><a title="热恋" type="emoji" class="face emoji69">热恋</a><a title="男孩" type="emoji" class="face emoji70">男孩</a><a title="女孩" type="emoji" class="face emoji71">女孩</a><a title="女士" type="emoji" class="face emoji72">女士</a><a title="男士" type="emoji" class="face emoji73">男士</a><a title="天使" type="emoji" class="face emoji74">天使</a><a title="骷髅" type="emoji" class="face emoji75">骷髅</a><a title="红唇" type="emoji" class="face emoji76">红唇</a><a title="太阳" type="emoji" class="face emoji77">太阳</a><a title="下雨" type="emoji" class="face emoji78">下雨</a><a title="多云" type="emoji" class="face emoji79">多云</a><a title="雪人" type="emoji" class="face emoji80">雪人</a><a title="月亮" type="emoji" class="face emoji81">月亮</a><a title="闪电" type="emoji" class="face emoji82">闪电</a><a title="海浪" type="emoji" class="face emoji83">海浪</a><a title="猫" type="emoji" class="face emoji84">猫</a><a title="小狗" type="emoji" class="face emoji85">小狗</a><a title="老鼠" type="emoji" class="face emoji86">老鼠</a><a title="仓鼠" type="emoji" class="face emoji87">仓鼠</a><a title="兔子" type="emoji" class="face emoji88">兔子</a><a title="狗" type="emoji" class="face emoji89">狗</a><a title="青蛙" type="emoji" class="face emoji90">青蛙</a><a title="老虎" type="emoji" class="face emoji91">老虎</a><a title="考拉" type="emoji" class="face emoji92">考拉</a><a title="熊" type="emoji" class="face emoji93">熊</a><a title="猪" type="emoji" class="face emoji94">猪</a><a title="牛" type="emoji" class="face emoji95">牛</a><a title="野猪" type="emoji" class="face emoji96">野猪</a><a title="猴子" type="emoji" class="face emoji97">猴子</a><a title="马" type="emoji" class="face emoji98">马</a><a title="蛇" type="emoji" class="face emoji99">蛇</a><a title="鸽子" type="emoji" class="face emoji100">鸽子</a><a title="鸡" type="emoji" class="face emoji101">鸡</a><a title="企鹅" type="emoji" class="face emoji102">企鹅</a><a title="毛虫" type="emoji" class="face emoji103">毛虫</a><a title="章鱼" type="emoji" class="face emoji104">章鱼</a><a title="鱼" type="emoji" class="face emoji105">鱼</a><a title="鲸鱼" type="emoji" class="face emoji106">鲸鱼</a><a title="海豚" type="emoji" class="face emoji107">海豚</a><a title="玫瑰" type="emoji" class="face emoji108">玫瑰</a><a title="花" type="emoji" class="face emoji109">花</a><a title="棕榈树" type="emoji" class="face emoji110">棕榈树</a><a title="仙人掌" type="emoji" class="face emoji111">仙人掌</a><a title="礼盒" type="emoji" class="face emoji112">礼盒</a><a title="南瓜灯" type="emoji" class="face emoji113">南瓜灯</a><a title="圣诞老人" type="emoji" class="face emoji114">圣诞老人</a><a title="圣诞树" type="emoji" class="face emoji115">圣诞树</a><a title="铃" type="emoji" class="face emoji116">铃</a><a title="气球" type="emoji" class="face emoji117">气球</a><a title="CD" type="emoji" class="face emoji118">CD</a><a title="相机" type="emoji" class="face emoji119">相机</a><a title="录像机" type="emoji" class="face emoji120">录像机</a><a title="电脑" type="emoji" class="face emoji121">电脑</a><a title="电视" type="emoji" class="face emoji122">电视</a><a title="电话" type="emoji" class="face emoji123">电话</a><a title="解锁" type="emoji" class="face emoji124">解锁</a><a title="锁" type="emoji" class="face emoji125">锁</a><a title="钥匙" type="emoji" class="face emoji126">钥匙</a><a title="成交" type="emoji" class="face emoji127">成交</a><a title="灯泡" type="emoji" class="face emoji128">灯泡</a><a title="邮箱" type="emoji" class="face emoji129">邮箱</a><a title="浴缸" type="emoji" class="face emoji130">浴缸</a><a title="钱" type="emoji" class="face emoji131">钱</a><a title="炸弹" type="emoji" class="face emoji132">炸弹</a><a title="手枪" type="emoji" class="face emoji133">手枪</a><a title="药丸" type="emoji" class="face emoji134">药丸</a><a title="橄榄球" type="emoji" class="face emoji135">橄榄球</a><a title="篮球" type="emoji" class="face emoji136">篮球</a><a title="足球" type="emoji" class="face emoji137">足球</a><a title="棒球" type="emoji" class="face emoji138">棒球</a><a title="高尔夫" type="emoji" class="face emoji139">高尔夫</a><a title="奖杯" type="emoji" class="face emoji140">奖杯</a><a title="入侵者" type="emoji" class="face emoji141">入侵者</a><a title="唱歌" type="emoji" class="face emoji142">唱歌</a><a title="吉他" type="emoji" class="face emoji143">吉他</a><a title="比基尼" type="emoji" class="face emoji144">比基尼</a><a title="皇冠" type="emoji" class="face emoji145">皇冠</a><a title="雨伞" type="emoji" class="face emoji146">雨伞</a><a title="手提包" type="emoji" class="face emoji147">手提包</a><a title="口红" type="emoji" class="face emoji148">口红</a><a title="戒指" type="emoji" class="face emoji149">戒指</a><a title="钻石" type="emoji" class="face emoji150">钻石</a><a title="咖啡" type="emoji" class="face emoji151">咖啡</a><a title="啤酒" type="emoji" class="face emoji152">啤酒</a><a title="干杯" type="emoji" class="face emoji153">干杯</a><a title="鸡尾酒" type="emoji" class="face emoji154">鸡尾酒</a><a title="汉堡" type="emoji" class="face emoji155">汉堡</a><a title="薯条" type="emoji" class="face emoji156">薯条</a><a title="意面" type="emoji" class="face emoji157">意面</a><a title="寿司" type="emoji" class="face emoji158">寿司</a><a title="面条" type="emoji" class="face emoji159">面条</a><a title="煎蛋" type="emoji" class="face emoji160">煎蛋</a><a title="冰激凌" type="emoji" class="face emoji161">冰激凌</a><a title="蛋糕" type="emoji" class="face emoji162">蛋糕</a><a title="苹果" type="emoji" class="face emoji163">苹果</a><a title="飞机" type="emoji" class="face emoji164">飞机</a><a title="火箭" type="emoji" class="face emoji165">火箭</a><a title="自行车" type="emoji" class="face emoji166">自行车</a><a title="高铁" type="emoji" class="face emoji167">高铁</a><a title="警告" type="emoji" class="face emoji168">警告</a><a title="旗" type="emoji" class="face emoji169">旗</a><a title="男人" type="emoji" class="face emoji170">男人</a><a title="女人" type="emoji" class="face emoji171">女人</a><a title="O" type="emoji" class="face emoji172">O</a><a title="X" type="emoji" class="face emoji173">X</a><a title="版权" type="emoji" class="face emoji174">版权</a><a title="注册商标" type="emoji" class="face emoji175">注册商标</a><a title="商标" type="emoji" class="face emoji176">商标</a>
+                    <!--<a ng-repeat="item in EmojiList" title="{{item}}" type="emoji" class="face">{{item}}</a>-->
+                </div>
+            </div>
+
+        </div>
+    </div>
+</script> 
+<script type="text/ng-template" id="createChatroom.html">
+<div class="dialog_hd">
+    <h3 class="title" ng-if="ngDialogData.isCreate">发起聊天</h3>
+    <h3 class="title" ng-if="ngDialogData.isAdd">添加会话成员</h3>
+</div>
+<div class="dialog_bd" ng-init="index=0" id="createChatRoomContainer">
+    <ul class="nav_tabs" ng-if="ngDialogData.isCreate">
+        <li class="nav_tab" ng-class="{'selected':$parent.index==0}" ng-click="$parent.index=0">选择联系人</li>
+        <li class="nav_tab" ng-class="{'selected':$parent.index==1}" ng-click="$parent.index=1">选择群聊</li>
+    </ul>
+    <div  contact-picker data-pick-config="pickConfig" data-select-list="selectedUsers" ng-style="{visibility:index==0?'visible':'hidden',width:index==0?'auto':'0',position:index==0?'static':'absolute'}" >
+
+    </div>
+    <div ng-style="{visibility:index==1?'visible':'hidden',width:index==1?'auto':'0',position:index==1?'static':'absolute'}" >
+        <!--BEGIN contact list-->
+        <div contact-list-directive
+             class="rooms"
+             data-all-contacts="chatroomContacts"
+             data-height-calc="chatRoomHeightCalc"
+             data-click-user-callback="selectChatroom"></div>
+        <!--END contact list-->
+    </div>
+
+</div>
+<div class="dialog_ft" ng-if="index==0">
+    <a ng-if="!selectedUsers.length" href="javascript:;" class="button_default">确定</a>
+    <a ng-if="selectedUsers.length && ngDialogData.isCreate" ng-click="create()" href="javascript:;" class="button_primary">确定<span ng-if="selectedUsers.length">({{selectedUsers.length}})</span></a>
+    <a ng-if="selectedUsers.length && ngDialogData.isAdd" ng-click="add()" href="javascript:;" class="button_primary">确定<span ng-if="selectedUsers.length">({{selectedUsers.length}})</span></a>
+</div>
+
+</script>
+<script type="text/ng-template" id="feedback.html">
+<div class="dialog_hd">
+    <h3 class="title">
+        意见反馈    </h3>
+</div>
+<div class="dialog_bd">
+    <textarea name="" cols="30" rows="10" ng-model="content" autofocus class="frm_feedback"></textarea>
+</div>
+<div class="dialog_ft">
+    <a href="javascript:" class="btn btn_primary" ng-click="send()">发送</a>
+</div>
+</script> 
+
+<script type="text/ng-template" id="editAreaContactPanel.html">
+<div jquery-scrollbar class="scrollbar-dynamic at_wrp" id="editAreaContactPanel" tabindex="-1" ng-keydown="keydown($event)">
+    <div class="at" >
+        <div mm-repeat="member in memberList" data-height="52" data-buffer-height="200" data-scroll-container=".at_wrp" data-no-cache="true">
+            <div  class="item" ng-class="{'on': (selectIndex == member._index)}" ng-click="click($event)" username="{{member.UserName}}" displayname="{{member.getDisplayName(chatRoomUserName)}}">
+                <div class="avatar">
+                    <img class="img" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png" mm-src="{{member.HeadImgUrl}}" alt=""/>
+                </div>
+                <div class="info">
+                    <h4 class="nickname" ng-bind-html="member.getDisplayName(chatRoomUserName)"></h4>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</script> 
+
+<script type="text/ng-template" id="imageUploadPreview.html">
+<div class="dialog_hd">
+    <h3 class="title">发送图片</h3>
+</div>
+<div class="dialog_bd">
+    <img class="loading" ng-show="!src" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/a7Nznaj.gif" alt=""/>
+    <img class="img" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2z6meE1.gif" mm-src="{{src}}" alt=""/>
+    <span class="vm_box"></span>
+</div>
+<div class="dialog_ft">
+    <a class="btn btn_default" href="javascript:" ng-click="cancel()">取消</a>
+    <a class="btn btn_primary" href="javascript:" ng-click="send()">发送</a>
+</div>
+</script>
+<script type="text/ng-template" id="userProfile.html">
+<div class="profile">
+
+    <div class="avatar">
+        <img class="img" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png" mm-src="{{user.HeadImgUrl + '&type=big'}}" alt="">
+    </div>
+
+    <div class="nickname_area">
+        <h4 class="nickname" ng-bind-html="user.getDisplayName()"></h4>
+        <i ng-class="{'web_wechat_women': user.Sex == 2, 'web_wechat_men': user.Sex == 1}"></i>
+    </div>
+
+    <p class="signature" ng-bind-html="user.Signature"></p>
+
+    <div class="meta_area">
+        <div class="meta_item">
+            <label ng-if="!user.isRoomContact()" class="label" for="">备注：</label>
+            <label ng-if="user.isRoomContact()" class="label" for="">群名：</label>
+            <p class="value" ng-bind-html="user.RemarkName || user.getDisplayName()"></p>
+        </div>
+        <div class="meta_item" ng-if="user.Province">
+            <label class="label" for="">地区：</label>
+            <p class="value">{{user.Province}} {{user.City}}</p>
+        </div>
+    </div>
+
+    <div class="action_area">
+        <a class="button" ui-sref="chat({userName:user.UserName})" href="javascript:;">发消息</a>
+    </div>
+    <!--<div class="profile_hd">-->
+        <!---->
+    <!--</div>-->
+    <!--<div class="profile_bd">-->
+        <!--<div class="meta">-->
+            <!--&lt;!&ndash; <div class="item">-->
+                <!--<label class="label" for="">微信号</label>-->
+                <!--<span class="value">{{user.UserName}}</span>-->
+            <!--</div> &ndash;&gt;-->
+            <!--<div class="item" ng-if="user.Signature">-->
+                <!--<span class="value" ng-bind-html="user.Signature"></span>-->
+            <!--</div>-->
+            <!--<div class="item location" ng-if="user.Province">-->
+                <!--<span class="value">{{user.Province}} {{user.City}}</span>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="profile_ft">-->
+        <!--<div class="action">-->
+            <!--<a class="send" ui-sref="chat({userName:user.UserName})" href="javascript:;">发消息</a>-->
+        <!--</div>-->
+    <!--</div>-->
+</div>
+</script>
+<script type="text/ng-template" id="miniUserProfile.html">
+<div class="profile_mini">
+    <div class="profile_mini_hd">
+        <img class="avatar" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png" mm-src="{{contact.HeadImgUrl + '&type=big'}}" alt="">
+        <div class="filter" style="background: url('{{contact.HeadImgUrl}}') no-repeat center bottom; -webkit-background-size: 230px 170px;">
+        </div>
+        <div class="darken"></div>
+        <div class="ext" ng-class="{'show_send_box': isShowSendBox || contact.Signature}">
+            <h3 class="nickname">
+                <span class="nickname_inner" ng-bind-html="contact.NickName"></span>
+                <i class="" ng-class="{'web_wechat_women': contact.Sex == 2, 'web_wechat_men': contact.Sex == 1}"></i>
+                <a ng-if="contact.isContact() && !contact.isBrandContact()" href="javascript:;" class="lunch" ng-click="chat(contact.UserName)">
+                    <i class="web_wechat_tab_launch-chat"></i>
+                </a>
+                <a ng-if="!contact.isBrandContact() && !contact.isContact() && !contact.MMFromVerifyMsg && !isShowSendBox" ng-click="$parent.isShowSendBox=true" href="javascript:;" class="lunch">
+                    <i class="web_wechat_tab_add"></i>
+                </a>
+                <a ng-if="!contact.isContact() && contact.MMFromVerifyMsg" ng-click="verifyUser($event)" href="javascript:;" class="agree">
+                    通过验证                </a>
+            </h3>
+            <p class="signature" ng-bind-html="contact.Signature" ng-if="contact.Signature && !isShowSendBox"></p>
+            <div ng-if="isShowSendBox">
+                <input type="text" class="add_user_cont" autofocus ng-model="addUserContent"/>
+                <a ng-if="!contact.isContact() && !contact.MMFromVerifyMsg" ng-click="addUser($event,addUserContent)" href="javascript:;" class="lunch send">发送</a>
+            </div>
+        </div>
+    </div>
+    <div class="profile_mini_bd">
+        <div class="group">
+            <p ng-if="contact.RemarkName" class="value" ng-bind-html="contact.RemarkName" ng-hide="editing" ng-click="editRemarkName()"></p>
+            <p ng-if="!contact.RemarkName" class="value" ng-hide="editing" ng-click="editRemarkName()" >无</p>
+            <div contenteditable="true" ng-show="editing" ng-bind-html="text" class="J_Text" ng-blur="save()" ng-keydown="save($event)"></div>
+            <label class="label" for="">
+                备注名            </label>
+        </div>
+        <div class="group">
+            <p ng-if="contact.Province" class="value">{{contact.Province}} {{contact.City}}</p>
+            <p ng-if="!contact.Province" class="value">无</p>
+            <label class="label" for="">
+                地区            </label>
+        </div>
+    </div>
+</div>
+</script>
+<script type="text/ng-template" id="profile_mini.html">
+<div class="profile_mini">
+    <div class="profile_mini_hd">
+        <div class="avatar">
+            <img class="img" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png" mm-src="{{contact.HeadImgUrl + '&type=big'}}" alt="">
+        </div>
+    </div>
+    <div class="profile_mini_bd">
+        <div class="nickname_area">
+            <!--BEGIN 发起聊天-->
+            <a class="opt" href="javascript:;"
+               ng-if="contact.isContact() && !contact.isBrandContact()"
+               ng-click="chat(contact.UserName)">
+                <i class="web_wechat_tab_launch-chat"></i>
+            </a>
+            <!--END 发起聊天-->
+            <!--BEGIN 添加好友-->
+            <a class="opt" href="javascript:;"
+               ng-if="!contact.isBrandContact() && !contact.isContact() && !contact.MMFromVerifyMsg && !isShowSendBox"
+               ng-click="$parent.isShowSendBox=true">
+                <i class="web_wechat_tab_add"></i>
+            </a>
+            <!--END 添加好友-->
+            <!--BEGIN 取消添加好友的叉-->
+            <a class="opt" href="javascript:;"
+               ng-if="isShowSendBox" ng-click="$parent.isShowSendBox=false">
+                <i class="web_wechat_tab_close"></i>
+            </a>
+            <!--END 取消添加好友的叉-->
+            <!--BEGIN 通过验证-->
+            <a class="opt" href="javascript:;"
+               ng-if="!contact.isContact() && contact.MMFromVerifyMsg"
+               ng-click="verifyUser($event)">
+                <i class="web_wechat_tab_add"></i>
+            </a>
+            <!--END 通过验证-->
+            <h4 ng-if="!isShowSendBox" class="nickname" ng-bind-html="contact.NickName"></h4>
+            <i ng-if="!isShowSendBox" ng-class="{'web_wechat_women': contact.Sex == 2, 'web_wechat_men': contact.Sex == 1}"></i>
+            <h4 ng-if="isShowSendBox" class="nickname">添加好友</h4>
+        </div>
+        <div class="meta_area" ng-if="!isShowSendBox">
+            <div class="meta_item">
+                <label class="label" for="">备注：</label>
+                <p class="value J_Text" contenteditable ng-bind-html="contact.RemarkName || MMDefaultRemark" ng-click="editRemarkName()" ng-blur="save()" ng-keydown="save($event)"></p>
+            </div>
+            <div class="meta_item" ng-if="contact.Province">
+                <label class="label" for="">地区：</label>
+                <p class="value">{{contact.Province}} {{contact.City}}</p>
+            </div>
+        </div>
+        <div class="form_area" ng-if="isShowSendBox">
+            <input type="text" class="verify_text" placeholder="输入验证信息" ng-model="addUserContent" maxlength="16"/>
+            <a class="button" href="javascript:;" ng-click="addUser($event,addUserContent)">发送</a>
+        </div>
+    </div>
+</div>
+</script> 
+
+<script type="text/ng-template" id="contactList.html">
+<div jquery-scrollbar class="J_ContactScrollBody scrollbar-dynamic contact_list" >
+    <!--BEGIN star contact list-->
+    <div data-no-cache="true"  mm-repeat="item in allContacts" data-height-calc="heightCalc" data-buffer-height="100">
+        <h4 ng-if='item.type=="header"'  class="contact_title">{{item.text}}</h4>
+        <div ng-if='item.type!="header"'
+             contact-item-directive
+             data-user="item"
+             data-click-user-callback="clickUserCallback"
+             ng-dblclick="dblclickCallback(item)"
+             ng-class="{'active':currentContact.UserName == item.UserName}"></div>
+    </div>
+</div>
+</script>
+
+<script type="text/ng-template" id="contactListChooser.html">
+<div class="chooser" >
+    <div jquery-scrollbar id="J_ContactPickerScrollBody"  class="contacts scrollbar-dynamic">
+        <!--BEGIN star contact list-->
+        <div mm-repeat="item in allContacts" data-height-calc="heightCalc" data-buffer-height="100" data-no-cache="true"
+             mm-repeat-keyboard mm-repeat-keyboard-scroll-selector="#J_ContactPickerScrollBody" >
+            <h4 ng-if='item.type=="header"'  class="contact_title">{{item.text}}</h4>
+            <div ng-if='item.type!="header"'
+                 contact-item-chooser-directive
+                 data-user="item"
+                 data-is-check="isCheck"
+                 data-click-user-callback="clickUserCallback"></div>
+        </div>
+
+    </div>
+</div>
+</script> 
+<script type="text/ng-template" id="contactItem.html">
+<div>
+    <h4 class="contact_title" ng-if="showOrderSymbol&&user.MMC">{{user.MMC}}</h4>
+    <div class="contact_item {{className}}" ng-click="clickUserCallback && clickUserCallback(user)">
+        <div class="avatar">
+            <img class="img lazy" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png" mm-src="{{user.HeadImgUrl}}" alt=""/>
+        </div>
+        <div class="info">
+            <h4 class="nickname" ng-bind-html="user.getDisplayName()"></h4>
+        </div>
+    </div>
+</div>
+</script> 
+<script type="text/ng-template" id="contactItemChooser.html">
+<!--<div ng-if="showOrderc && ($parent.curC!=user.orderC.charAt(0))&&($parent.curC=user.orderC.charAt(0))">{{$parent.curC}}</div>-->
+<div class="contact_item" ng-click="clickUserCallback && clickUserCallback(user)">
+    <div class="opt">
+        <i ng-class='{"web_wechat_choose_wireframe":!isCheck(user.UserName),"web_wechat_choose_green":isCheck(user.UserName)}'></i>
+    </div>
+    <div class="avatar">
+        <img class="img lazy" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png" mm-src="{{user.HeadImgUrl}}" alt=""/>
+    </div>
+    <div class="info">
+        <h4 class="nickname" ng-bind-html="user.getDisplayName()"></h4>
+    </div>
+</div>
+</script> 
+
+<script type="text/ng-template" id="contextMenu.html">
+<div id="contextMenu" class="dropdown contextMenu open" ng-show="isShowContextMenu" ng-style="contextStyle">
+    <ul class="dropdown_menu">
+        <li ng-repeat="item in contextMenuList" class="{{item.isDisabled?'disabled':''}}">
+            <a ng-if="item.isCopy" clip-copy="item.copyCallBack($event)" clip-click="item.callback()"  id="{{item.id}}" tabindex="-1" href="javascript:;">{{item.content}}</a>
+            <a ng-if="item.isDownload" download href="{{item.downloadUrl}}">{{item.content}}</a>
+            <a ng-if="!item.isCopy && !item.isDownload" id="{{item.id}}" tabindex="-1" href="javascript:;" ng-click="item.callback()">{{item.content}}</a>
+        </li>
+    </ul>
+</div>
+</script> 
+
+<script type="text/ng-template" id="navChat.html">
+<!--BEGIN chat list-->
+<div jquery-scrollbar class="chat_list scrollbar-dynamic" id="J_NavChatScrollBody" data-username="{{currentUserName}}">
+    <p class="ico_loading" ng-hide="chatList.length > 0"><img src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/25x4Rho.gif" alt=""/>正在获取最近的聊天...</p>
+
+    <div  data-no-cache="true" mm-repeat="chatContact in chatList track by chatContact.UserName" data-height="64" data-buffer-height="200">
+        <div class="chat_item slide-left"
+             ng-if="!chatContact.isShieldUser()"
+             data-username="{{chatContact.UserName}}"
+             ng-click="itemClick(chatContact.UserName)"
+             ng-class="{'active': (chatContact.UserName == currentUserName),'top':chatContact.isTop()}"
+             data-cm='{"type":"chat","username":"{{chatContact.UserName}}"}'>
+
+            <div class="ext">
+                <p class="attr">{{chatContact.MMDigestTime}}</p>
+                <p ng-if="chatContact.isMuted()" class="attr" ng-class="{'no_time': !chatContact.MMDigestTime}">
+                    <i class="web_wechat_no-remind" ng-class="{'web_wechat_no-remind_hl': (chatContact.UserName == currentUserName)}"></i>
+                </p>
+            </div>
+
+            <div class="avatar">
+                <img class="img" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png" mm-src="{{chatContact.HeadImgUrl}}" alt=""/>
+
+                <i class="icon web_wechat_reddot" ng-if="chatContact.NoticeCount && chatContact.isMuted()"></i>
+
+                <i class="icon web_wechat_reddot_middle" ng-class="{web_wechat_reddot_middle: chatContact.NoticeCount < 99, web_wechat_reddot_bbig: chatContact.NoticeCount >=99}" ng-if="chatContact.NoticeCount && !chatContact.isMuted()">{{chatContact.NoticeCount>99?'...':chatContact.NoticeCount;}}</i>
+
+            </div>
+
+            <div class="info">
+                <h3 class="nickname">
+                    <span class="nickname_text" ng-bind-html="chatContact.getDisplayName()"></span>
+                    <!--<span class="nickname_count" ng-if="chatContact.MemberList.length">({{chatContact.MemberList.length}})</span>-->
+                </h3>
+
+                <p class="msg" ng-if="chatContact.MMDigest">
+                    <span class="status" ng-if="chatContact.MMStatus == CONF.MSG_SEND_STATUS_SENDING">
+                        <i class="web_wechat_send" ng-class="{'web_wechat_send_w': chatContact.UserName == currentUserName}"></i>
+                    </span>
+                    <span ng-if="chatContact.NoticeCount>1 && chatContact.isMuted()">[{{chatContact.NoticeCount}}条]</span>
+                    <span ng-bind-html="chatContact.MMDigest"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<!--END chat list-->
+</script> 
+
+<script type="text/ng-template" id="navContact.html">
+<!--BEGIN contact list-->
+<div id="navContact"
+     contact-list-directive
+     data-all-contacts="allContacts"
+     data-current-contact="currentContact"
+     data-star-contacts="starContacts"
+     data-chatroom-contacts="chatroomContacts"
+     data-friend-contacts="friendContacts"
+     data-click-user-callback="showProfile"
+     data-dblclick-callback="dblclick"
+        ></div>
+<!--END contact list-->
+</script> 
+
+<script type="text/ng-template" id="navRead.html">
+<!--BEGIN chat list-->
+<div jquery-scrollbar class="read_list scrollbar-dynamic" id="J_NavReadScrollBody">
+
+    <p class="ico_loading" ng-show="subscribeMsgs.defaultValue"><img src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/25x4Rho.gif" alt=""/>加载中...</p>
+    <p class="ico_loading" ng-show="!subscribeMsgs.defaultValue && subscribeMsgs.length == 0">暂无文章...</p>
+    <div  data-no-cache="true" mm-repeat="readItem in articleList" data-height-calc="heightCalc" data-buffer-height="200" mm-repeat-keyboard mm-repeat-keyboard-scroll-selector="#J_NavReadScrollBody">
+        <div class="just_for_bg" ng-if="readItem.UserName" ng-class="{first: readItem._index === 0}">
+            <div class="read_item_hd">
+                <p class="date">{{readItem.Time|timeFormat}}</p>
+                <div class="avatar">
+                    <img class="img" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2z6meE1.gif" mm-src="{{readItem.HeadImgUrl}}" alt=""/>
+                </div>
+                <p class="info">
+                    <span class="username">{{readItem.NickName}}</span>
+                </p>
+            </div>
+        </div>
+        <div ng-if="!readItem.UserName" class="read_item slide-left"
+             ng-click="itemClick(readItem)"
+             ng-class="{'active': (readItem == currentItem)}"
+                >
+            <div class="cont">
+                <h3 class="title">{{readItem.Title}}</h3>
+            </div>
+            <div class="ext">
+                <div class="cover">
+                    <div class="img" ng-style="{'background-image': 'url('+ readItem.Cover +')'}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--END chat list-->
+</script> 
+
+<script type="text/ng-template" id="contentChat.html">
+<div id="chatArea" ng-class="{'chatRoom':currentContact.isRoomContact(),'no-choose':!currentContact.getDisplayName()}" class="box chat">
+
+
+
+    <!--BEGIN HD-->
+    <div class="box_hd">
+        <!--<a class="ext web_wechat_addfriend" href="javascript:;" ng-click="showChatRoomMembers($event)" ng-show="currentContact.isRoomContact()" title="成员"></a>-->
+        <!--<a class="ext web_wechat_addfriend" href="javascript:;" ng-click="showProfile($event)" ng-show="!currentContact.isRoomContact()" title="Profile"></a>-->
+        <div id="chatRoomMembersWrap"></div>
+        <div class="title_wrap">
+            <div class="title poi" ng-click="currentContact.MMCanCreateChatroom && showChatRoomMembers($event)">
+                <a class="title_name"  data-username="{{currentContact.UserName}}"  ng-bind-html="currentContact.getDisplayName()"></a>
+                <span class="title_count" ng-if="currentContact.MemberList.length">({{currentContact.MemberList.length}})</span>
+                <i class="" ng-class="{'web_wechat_up_icon': isShowChatRoomMembers, 'web_wechat_down_icon': !isShowChatRoomMembers}" ng-show="currentContact.getDisplayName() && currentContact.MMCanCreateChatroom"></i>
+            </div>
+        </div>
+
+    </div>
+    <!--END HD-->
+
+    <div ng-if="unreadMessageCount>10&&!bottomUnreadCount" class="unread" ng-click="scrollToTopUnread()"><span class="unread-up-icon"></span>{{ unreadMessageCount}} 条新消息</div>
+    <div ng-if="bottomUnreadCount" class="unread-bottom" ng-click="scrollToBottomUnread()"><span class="unread-bottom-icon"></span>{{ bottomUnreadCount }} 条新消息</div>
+
+    <!--BEGIN BD-->
+    <div
+         jquery-scrollbar
+         class="box_bd chat_bd scrollbar-dynamic"
+         data-cm='{"type":"clean","username":"{{currentUser}}"}'>
+
+
+
+
+        <div mm-repeat="message in chatContent" data-height-calc="heightCalc" data-buffer-height="300" data-pre-calc="true">
+             <div class="clearfix"  message-directive></div>
+        </div>
+
+        <!--<div message-directive
+             ng-repeat="message in chatContent track by message.MsgId"
+             class="clearfix"
+             ng-class="{'slide-top':messagesAnimate}"
+             ></div>
+-->     <div id="prerender"  style="
+      visibility: hidden;
+  position: absolute;
+  width: 100%;
+  top: 333px;
+  height: 0;
+  padding: 0 19px;
+  box-sizing: border-box;
+  margin-left: -19px;
+  overflow: hidden;
+"></div>
+        <div ng-if="chatContent.length < 1" class="message_empty">
+            <i class="web_wechat_nomes_icon" ng-hide="currentContact.getDisplayName()"></i>
+            <p ng-show="currentContact.getDisplayName()">暂时没有新消息</p>
+            <p ng-hide="currentContact.getDisplayName()">未选择聊天</p>
+        </div>
+    </div>
+    <!--END BD-->
+    <!--BEGIN FT-->
+    <div class="box_ft" ng-controller="chatSenderController" ng-show="currentContact && !currentContact.isReadOnlyContact()">
+        <div class="toolbar" id="tool_bar">
+            <a class="web_wechat_face" ng-click="showEmojiPanel($event)" href="javascript:;" title="表情"></a>
+            <a mm-action-track track-type="['click']" track-opt="{'target':'截图'}"class="web_wechat_screencut" ng-hide="noflash" ng-click="screenShot()" href="javascript:;" title="截屏"></a>
+            <a mm-action-track track-type="['click']" ng-click="sendClick($event)" track-opt="{'target':'发文件'}"  class="web_wechat_pic js_fileupload" ng-hide="noflash" href="javascript:;" title="图片和文件"></a>
+        </div>
+        <div class="content" mm-action-track track-type="['click','keydown']" track-opt="{target:'发送框',keys:['enter','backspace','blankspace']}" >
+            <pre    id="editArea" contenteditable-directive mm-paste class="flex edit_area" contenteditable="true" ng-blur="editAreaBlur($event)" ng-model="editAreaCtn" ng-click="editAreaClick($event)" ng-keyup="editAreaKeyup($event)" ng-keydown="editAreaKeydown($event)"></pre>
+            <span class="caret_pos_helper" id="caretPosHelper"></span>
+        </div>
+
+        <div class="action">
+            <span ng-if="!isMacOS" class="desc">按下Ctrl+Enter换行</span>
+            <span ng-if="isMacOS" class="desc">按下Cmd+Enter换行</span>
+            <a class="btn btn_send" href="javascript:;" ng-click="sendTextMessage()">发送</a>
+        </div>
+    </div>
+    <!--END FT-->
+
+<!--    <div class="upload-file-area" >{{currentContact.getDisplayName()}}</div>-->
+    <div id="J_CatchDrop" class="catch-drop-area"></div>
+</div>
+</script>
+<script type="text/ng-template" id="contentContact.html">
+<div class="box">
+    <div class="box_hd with_border">
+        <div class="title_wrap">
+            <div class="title">详细信息</div>
+        </div>
+    </div>
+    <div class="box_bd">
+        <div ng-if="currentContact" user-profile-directive data-user="currentContact"></div>
+        <div ng-if="!currentContact" class="empty">
+            <i class="web_wechat_no_contect"></i>
+        </div>
+    </div>
+</div>
+</script> 
+<script type="text/ng-template" id="contentRead.html">
+<div class="box reader">
+    <div class="box_hd with_border read_list_header">
+        <div class="ext" ng-if="readItem">
+            <a href="javascript:;" ng-click="optionMenu();">
+                <i class="titlebar_menuicon"></i>
+            </a>
+        </div>
+        <div class="title_wrap">
+            <div class="title">{{readItem.AppName}}</div>
+        </div>
+    </div>
+    <div class="box_bd">
+        <iframe ng-src="{{readItem.Url}}" frameborder="0" class="iframe" id="reader"></iframe>
+    </div>
+</div>
+</script> 
+
+
+<script type="text/ng-template" id="message.html">
+<div ng-switch on="message.MsgType" style="overflow: hidden;"  ng-init="contact = getUserContact(message.MMActualSender,message.MMPeerUserName);">
+    <!-- 系统消息 -->
+    <div ng-switch-when="10000" ng-init="messageHandle(message);">
+        <div ng-if="(newMsg && newMsg==message)" class="message_system"><div ng-if="(isScrollToUnread && newMsg==message)" class="content unread-content">
+            <div class="line-left"></div>
+            以下是新消息            <div class="line-right"></div>
+        </div></div>
+        <p class="message_system"><span class="content" ng-bind-html="message.MMActualContent"></span></p>
+    </div>
+    <div ng-switch-default class="message" ng-class='{"you":!message.MMIsSend,"me":message.MMIsSend,"first":($index==0&&!message.MMTime)}'>
+        <div ng-if="message.MMTime||(newMsg && newMsg==message)" class="message_system"><div ng-if="(isScrollToUnread && newMsg==message)" class="content unread-content">
+                <div class="line-left"></div>
+            以下是新消息                <div class="line-right"></div>
+            </div><div ng-if="(message.MMTime&&!(newMsg && newMsg==message))" class="content">{{message.MMTime}}</div></div>
+
+
+
+        <img class="avatar" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png" mm-src="{{getUserContact(message.MMActualSender,message.MMPeerUserName).HeadImgUrl}}" data-cm='{"type":"avatar","username":"{{message.MMActualSender}}","isFriend":"{{getUserContact(message.MMActualSender,message.MMPeerUserName).isContact()}}"}' title="{{getUserContact(message.MMActualSender,message.MMPeerUserName).getDisplayName(message.MMPeerUserName)|emojiHideFilter}}" ng-click="showProfile($event,message.MMActualSender)"/>
+        <div class="content">
+            <h4 ng-if="message.MMIsChatRoom && !message.MMIsSend" class="nickname" ng-bind-html="getUserContact(message.MMActualSender,message.MMPeerUserName).getDisplayName(message.MMPeerUserName)"></h4>
+            <div class="bubble js_message_bubble" ng-if="message.MsgType != CONF.MSGTYPE_EMOTICON" ng-class='{"bubble_default left":!message.MMIsSend,"bubble_primary right":message.MMIsSend, "arrow_primary": message.MsgType == CONF.MSGTYPE_APP && message.AppMsgType == CONF.APPMSGTYPE_URL, "no_arrow": message.MsgType == CONF.MSGTYPE_IMAGE || message.MsgType == CONF.MSGTYPE_MICROVIDEO || message.MsgType == CONF.MSGTYPE_VIDEO}'
+                 data-cm='{"type":"message","actualSender":"{{message.MMActualSender}}",
+                 "msgType":"{{message.MsgType}}","subType":{{message.SubMsgType||0}},"msgId":"{{message.MsgId}}"}'>
+                
+                <!--news消息-->
+                <div class="bubble_cont primary" ng-if="message.MsgType == CONF.MSGTYPE_TEXT && message.MMPeerUserName == 'newsapp'" >
+                    <ul>
+                        <li ng-repeat="newitem in message.MMCategory.newitem">
+                            <a href="{{newitem.url}}">
+                                <img ng-src="{{newitem.cover}}"/>{{newitem.title}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!--红包消息-->
+                <div class="bubble_cont" ng-if="message.MsgType == CONF.MSGTYPE_APP && message.AppMsgType == CONF.APPMSGTYPE_RED_ENVELOPES">
+                    <div class="luckmoney">
+                        <div class="luckmoney_bd">
+                            <div class="cover">
+                                <i class="web_wechat_redbag"></i>
+                            </div>
+                            <div class="cont">
+                                <h4 class="title">恭喜发财，大吉大利</h4>
+                                <p class="desc">请在手机上领取红包</p>
+                            </div>
+                        </div>
+                        <div class="luckmoney_ft">
+                            <p>微信红包</p>
+                        </div>
+                    </div>
+                </div>
+                <!--纯文本消息-->
+                <div class="bubble_cont" ng-if="message.MsgType == CONF.MSGTYPE_TEXT && message.SubMsgType != CONF.MSGTYPE_LOCATION">
+                    <div class="plain">
+                        <pre class="js_message_plain" ng-bind-html="message.MMActualContent"></pre>
+                        <img ng-show="message.MMStatus == 1" class="ico_loading" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/25x4Rho.gif" alt=""/>
+                        <i class="ico_fail web_wechat_message_fail" ng-click="resendMsg(message)" ng-show="message.MMStatus == 5" title="重新发送"></i>
+                    </div>
+                </div>
+
+                <!-- 地理消息 -->
+                <div class="bubble_cont" ng-if="message.MsgType == CONF.MSGTYPE_TEXT && message.SubMsgType == CONF.MSGTYPE_LOCATION">
+                    <div class="location">
+                        <a href="{{message.MMLocationUrl}}" target="_blank">
+                            <img mm-src="/cgi-bin/mmwebwx-bin/webwxgetpubliclinkimg?url=xxx&msgid={{message.MsgIdBeforeTranspond || message.MsgId}}&pictype=location"
+                                 alt="" class="img" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2z6meE1.gif"/>
+                            <p class="desc">{{message.MMLocationDesc}}</p>
+                        </a>
+                    </div>
+                </div>
+
+
+
+                <!--图片消息-->
+                <div class="bubble_cont" ng-if="message.MsgType == CONF.MSGTYPE_IMAGE">
+                    <div class="picture" ng-init="imageInit(message,message.MMPreviewSrc || message.MMThumbSrc || getMsgImg(message.MsgId,'slave'))"  ><!--ng-if="message.MMStatus == CONF.MSG_SEND_STATUS_SUCC"ng-init="(message.MMStatus==CONF.MSG_SEND_STATUS_SUCC)&&(imagesMessagesList.push(getMsgImg(message.MsgId)))" -->
+                        <img class="msg-img" ng-style="message.MMImgStyle" ng-click="previewImg(message)" ng-src="{{message.MMPreviewSrc || message.MMThumbSrc || getMsgImg(message.MsgId,'slave')}}" />
+                        <i class="arrow"></i>
+                        <p class="loading" ng-show="message.MMStatus == 1 || message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_FAIL">
+                            <img src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/25x4Rho.gif" alt=""/>
+                        </p>
+                    </div>
+                </div>
+
+                <!--语音消息-->
+                <div class="bubble_cont" ng-if="message.MsgType == CONF.MSGTYPE_VOICE">
+                    <div class="voice" ng-style="{'width':40 + 7*message.VoiceLength/1000}" ng-click="playVoice(message)">
+                        <i ng-class="{'web_wechat_voice_green':message.MMIsSend,'web_wechat_voice_gray':!message.MMIsSend, 'web_wechat_voice_playing': message.MMPlaying&&message.MMIsSend,'web_wechat_voice_gray_playing': message.MMPlaying&&!message.MMIsSend}"></i>
+                        <span class="duration">{{message.VoiceLength|VoiceLengthFilter}}''<i class="web_wechat_noread"ng-show="message.MMVoiceUnRead"></i></span>
+                    </div>
+                </div>
+
+                <!--视频消息 todo-->
+                <div class="bubble_cont" ng-if="message.MsgType == CONF.MSGTYPE_VIDEO">
+                    <div class="video" ng-click="showVideo(message.MsgId)">
+                         <img height="120" width="160" ng-if="message.MMStatus!=1 && message.MMFileStatus !== CONF.MM_SEND_FILE_STATUS_FAIL" class="msg-img"  ng-style="message.MMImgStyle" mm-src="{{getMsgImg(message.MsgId,'slave')}}" />
+                        <i ng-if="message.MMStatus!=1 && message.MMFileStatus !== CONF.MM_SEND_FILE_STATUS_FAIL" class="web_wechat_paly"></i>
+                        <i ng-if="message.MMStatus!=1 && message.MMFileStatus !== CONF.MM_SEND_FILE_STATUS_FAIL" class="arrow"></i>
+                        <img  ng-if="message.MMStatus == 1 || message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_FAIL" class="msg-img"  src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2z6meE1.gif" width="160" height="120" alt="">
+
+                        <p class="loading" ng-show="message.MMStatus == 1 || message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_FAIL">
+                            <img src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/25x4Rho.gif" alt=""/>
+                        </p>
+                    </div>
+
+                </div>
+
+                <!--小视频消息-->
+                <div class="bubble_cont" ng-if="message.MsgType == CONF.MSGTYPE_MICROVIDEO" ng-click="showMicroVideo(message.MsgId)">
+                    <div jplayer-directive
+                           id="jplayer-{{message.MsgId}}"
+                           class="jp-jplayer microvideo"
+                           ng-src="{{getMsgVideo(message.MsgId)}}"
+                           poster="{{getMsgImg(message.MsgId,'slave')}}"
+                           ng-class="{'loaded':loaded}"
+                           timeout="10"
+                           autoplay
+                           loop
+                           muted></div>
+                </div>
+
+
+                <!--名片消息-->
+                <div class="bubble_cont primary" ng-if="message.MsgType == CONF.MSGTYPE_SHARECARD" ng-click="showProfile($event,message.RecommendInfo.UserName)">
+                    <div class="card">
+                        <div class="card_hd"><p>名片</p></div>
+                        <div class="card_bd">
+                            <div class="card_avatar">
+                                <img class="img" mm-src="{{message.RecommendInfo.HeadImgUrl}}" alt=""/>
+                            </div>
+                            <div class="info">
+                                <h3 class="display_name" ng-bind-html="message.RecommendInfo.NickName"></h3>
+                                <!--<p class="signature" ng-bind-html="message.MMUserName"></p>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!--朋友验证消息-->
+                <div class="bubble_cont primary" ng-if="message.MsgType == CONF.MSGTYPE_VERIFYMSG" ng-click="showProfile($event,message.RecommendInfo.UserName)">
+                    <div class="card">
+                        <div class="card_hd"><p>朋友验证请求</p></div>
+                        <div class="card_bd">
+                            <div class="card_avatar">
+                                <img class="img" mm-src="{{message.RecommendInfo.HeadImgUrl}}" alt=""/>
+                            </div>
+                            <div class="info">
+                                <h3 class="display_name" ng-bind-html="message.RecommendInfo.NickName"></h3>
+                                <p class="signature"><span ng-bind-html="message.RecommendInfo.NickName"></span>:<span ng-bind-html="message.RecommendInfo.Content"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--链接消息-->
+                <div class="bubble_cont primary" ng-if="message.MsgType == CONF.MSGTYPE_APP && message.AppMsgType == CONF.APPMSGTYPE_URL">
+                    <a ng-href="{{message.Url|checkurlFilter}}" ng-click="appMsgClick($event,message.MMAlert)" target="_blank" class="app">
+                        <h4 class="title" ng-bind="message.FileName"></h4>
+                        <img class="cover" mm-src="{{getMsgImg(message.MsgIdBeforeTranspond || message.MsgId,'slave')}}"  alt=""/>
+                        <p class="desc" ng-bind="message.MMAppMsgDesc"></p>
+                    </a>
+                </div>
+
+                <!--附件-->
+                <div class="bubble_cont primary" ng-if="message.MsgType == CONF.MSGTYPE_APP && message.AppMsgType == CONF.APPMSGTYPE_ATTACH">
+                    <div class="attach">
+                        <div class="attach_bd">
+                            <div class="cover" ng-switch on="message.MMAppMsgFileExt">
+                                <i ng-switch-when="txt" class="icon-txt"></i>
+                                <i ng-switch-when="pdf" class="icon-pdf"></i>
+                                <i ng-switch-when="xls" class="icon-xls"></i>
+                                <i ng-switch-when="xlsx" class="icon-xlsx"></i>
+                                <i ng-switch-when="doc" class="icon-doc"></i>
+                                <i ng-switch-when="docx" class="icon-docx"></i>
+                                <i ng-switch-when="ppt" class="icon-ppt"></i>
+                                <i ng-switch-when="pptx" class="icon-pptx"></i>
+                                <i ng-switch-when="zip" class="icon-zip"></i>
+                                <i ng-switch-when="numbers" class="icon-numbers"></i>
+                                <i ng-switch-when="pages" class="icon-pages"></i>
+                                <i ng-switch-when="key" class="icon-key"></i>
+                                <i ng-switch-default class="icon-unknown"></i>
+                            </div>
+                            <div class="cont">
+                                <p class="title" ng-bind="message.FileName"></p>
+                                <div class="opr">
+                                    <span ng-bind="message.MMAppMsgFileSize"></span>
+                                    <span class="sep">|</span>
+
+                                    <a ng-if="message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_QUEUED
+                                    || message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_SENDING
+                                    || message.MMStatus == CONF.MSG_SEND_STATUS_SENDING
+                                    " ng-click="cancelUploadFile(message)" href="javascript:">取消</a>
+                                    <a download ng-if="message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_SUCCESS  && (message.MMStatus == CONF.MSG_SEND_STATUS_SUCC || message.MMStatus === undefined)  " href="{{message.MMAppMsgDownloadUrl}}">下载</a>
+                                    <span ng-if="message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_CANCEL">已取消</span>
+                                    <span ng-if="message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_FAIL || message.MMStatus == CONF.MSG_SEND_STATUS_FAIL">上传失败</span>
+
+                                    <p ng-if="message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_QUEUED || message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_SENDING" class="progress_bar" ng-show="message.MMUploadProgress < 100">
+                                        <span class="progress" ng-style="{width: message.MMUploadProgress + '%'}"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 模版消息 -->
+                <div class="bubble_cont primary" ng-if="message.MsgType == CONF.MSGTYPE_APP && message.AppMsgType == CONF.APPMSGTYPE_READER_TYPE" >
+                    <ul class="reader">
+                        <li ng-repeat="item in message.MMCategory">
+                            <a class="link" href="{{item.url|checkurlFilter}}" target="_blank">
+                                <h4 class="title">{{item.title}}</h4>
+                                <p class="date">{{item.pub_time}}</p>
+                                <img class="cover" mm-src="{{item.cover}}"/>
+                                <p class="desc">{{item.digest}}</p>
+                                <p class="more">阅读原文 >></p>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!--表情消息-->
+            <div  data-cm='{"type":"message","actualSender":"{{message.MMActualSender}}",
+                 "msgType":"{{message.MsgType}}","subType":{{message.SubMsgType||0}},"msgId":"{{message.MsgId}}"}' class="emoticon" ng-if="message.MsgType == CONF.MSGTYPE_EMOTICON">
+                <img  ng-style="message.MMImgStyle" class="custom_emoji msg-img" ng-src="{{message.MMPreviewSrc || getMsgImg(message.MsgId,'big',message)  || message.MMThumbSrc}}"  />
+                <!--<p class="loading" ng-show="message.MMStatus == 1 || message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_FAIL">
+                    <img src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/25x4Rho.gif" alt=""/>
+                </p>-->
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+</script> 
+
+<script type="text/ng-template" id="searchList.html">
+<div jquery-scrollbar search-list-directive class="contacts scrollbar-dynamic">
+    <!--data-height-calc="heightCalc"-->
+    <div mm-repeat="item in allContacts" data-height-calc="heightCalc" data-buffer-height="100" data-no-cache="true">
+        <h4 ng-if='item.type=="header"'  class="contact_title" ng-class="{first:$index==0}">{{item.text}}</h4>
+        <div ng-if='item.type!="header"'
+             contact-item-directive
+             data-class-name="{{selectIndex == item._index?'on':''}}"
+             data-user="item"
+             data-click-user-callback="clickUserCallback"
+             ng-class="{'active':currentContact.UserName == item.UserName}"></div>
+    </div>
+    <div ng-if="!allContacts.length">
+        <h4 class="contact_title">找不到匹配的结果</h4>
+    </div>
+</div>
+</script>
+<script type="text/ng-template" id="systemMenu.html">
+<ul class="dropdown_menu">
+    <li>
+        <a tabindex="-1" href="javascript:;" ng-click="createChatroom()" title="发起聊天">
+            <i class="menuicon_chat"></i>发起聊天        </a>
+    </li>
+    <li>
+        <a tabindex="-1" href="javascript:;" ng-if="!isNotifyOpen" ng-click="openNotify()" title="打开桌面通知">
+            <i class="menuicon_push_off"></i>打开桌面通知        </a>
+        <a tabindex="-1" href="javascript:;" ng-if="isNotifyOpen" ng-click="closeNotify()" title="关闭桌面通知">
+            <i class="menuicon_push_on"></i>关闭桌面通知        </a>
+    </li>
+    <li>
+        <a tabindex="-1" href="javascript:;" ng-if="!isSoundOpen" ng-click="openSound()" title="打开声音">
+            <i class="menuicon_volume_mute"></i>打开声音        </a>
+        <a tabindex="-1" href="javascript:;" ng-if="isSoundOpen" ng-click="closeSound()" title="关闭声音">
+            <i class="menuicon_volume_on"></i>关闭声音        </a>
+    </li>
+    <li>
+        <a tabindex="-1" href="javascript:;" ng-click="feedback()" title="意见反馈">
+            <i class="menuicon_feedback"></i>意见反馈        </a>
+    </li>
+    <li class="last_child">
+        <a tabindex="-1" href="javascript:;" ng-click="loginout()" title="退出">
+            <i class="menuicon_quit"></i>退出        </a>
+    </li>
+</ul>
+
+</script> 
+
+<script type="text/ng-template" id="readMenu.html">
+<ul class="dropdown_menu">
+    <li>
+        <a href="javascript:;" title="复制网页链接" clip-copy="copyLink()" clip-click="copyCallback()">
+            <i class="menuicon_copylink"></i>
+            复制网页链接        </a>
+    </li>
+    <!--<li>-->
+        <!--<a href="javascript:;" title="转发" ng-click="forwarding()">转发</a>-->
+    <!--</li>-->
+    <li class="last_child">
+        <a href="javascript:;" title="新窗口中打开" ng-click="openTab()">
+            <i class="menuicon_newtab"></i>
+            新窗口中打开        </a>
+    </li>
+</ul>
+
+</script> 
+<script type="text/ng-template" id="preview.html">
+<div class="mask preview_mask" ></div>
+<div class="img_preview_container" id="preview_container" ng-class="{loading: !isLoaded}" ng-style="containerStyle">
+    <div class="img_container" id="img_container">
+        <div class="img_wrp" id="img_dom" >
+            <!-- webkit 的 transform 有导致不 reflow 的bug，强行改变其子元素来强制reflow-->
+            <span ng-if="reflowFlag"></span>
+            <img class="rotate{{rotateDeg}}" ng-show="isLoaded" id="img_preview" />
+            <a href="javascript:" ng-click="actions.close();" class="img_preview_close" title="关闭"><i class="web_wechat_close-window"></i></a>
+        </div>
+    </div>
+    <div class="img_opr_container" id="img_opr_container">
+        <ul class="img_opr_list">
+            <li class="img_opr_item">
+                <a ng-click="actions.prev()" href="javascript:" title="查看上一个">
+                    <i class="web_wechat_left" ng-class="{'web_wechat_left_disable': current <= 0}"></i>&nbsp;
+                </a>
+            </li>
+            <li class="img_opr_item">
+                <a download href="{{imageList[current].url + '&fun=download'}}" title="下载图片">
+                    <i class="web_wechat_download"></i>&nbsp;
+                </a>
+            </li>
+            <li class="img_opr_item" ng-hide="isIE">
+                <a ng-click="actions.rotate()" href="javascript:" title="旋转图片">
+                    <i class="web_wechat_turn"></i>&nbsp;
+                </a>
+            </li>
+            <li class="img_opr_item">
+                <a ng-click="actions.next()" href="javascript:" title="查看下一个">
+                    <i class="web_wechat_right" ng-class="{'web_wechat_right_disable': current >= imageList.length - 1}"></i>&nbsp;
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+</script>
+<script type="text/ng-template" id="mmRepeatDirective.html">
+<div style="height: {{topPlaceHoldHeight}}px" class="top-placeholder"></div>
+    <div class="ng-repeat" ng-repeat="ngRepeat">
+        <div ng-transclude>
+
+        </div>
+    </div>
+<div style="height: {{bottomPlaceHoldHeight}}px" class="bottom-placeholder"></div>
+</script>
+
+<script type="text/ng-template" id="comfirmTips.html">
+<div class="dialog_hd">
+    <h3 class="title">
+        {{title}}
+    </h3>
+</div>
+<div class="dialog_bd" style="text-align:center;padding:40px 0;">
+    {{content}}
+</div>
+<div class="dialog_ft">
+    <a href="javascript:;" class="btn btn_primary" ng-click="callback()">确定</a>
+</div>
+</script> 
+<script type="text/ng-template" id="editorDialog.html">
+<div class="dialog_hd">
+    <h3 class="title">修改群名</h3>
+</div>
+<div class="dialog_bd">
+    <div contenteditable="true" ng-bind-html="text" class="chatroom_name" ng-keydown="keypress($event);"></div>
+</div>
+<div class="dialog_ft">
+    <a class="button_primary" href="javascript:" ng-click="send()">确定</a>
+</div>
+</script>
+<script type="text/ng-template" id="contactPicker.html">
+<div>
+    <!--BEGIN selector-->
+    <div class="selector">
+        <div class="contactor" ng-repeat="user in selectList">
+            <div class="avatar">
+                <img class="img" src="//res.wx.qq.com/a/wx_fed/webwx/res/static/img/2KriyDK.png" mm-src="{{user.HeadImgUrl}}" alt=""/>
+            </div>
+            <div class="opt"><i class="web_wechat_delete" ng-click="delUser(user.UserName)"></i></div>
+        </div>
+        <div class="input_box">
+            <i class="addchat_searchicon"></i>
+            <input type="text" class="input" placeholder='搜索' ng-model="keyword" ng-input="search($event)" autofocus/>
+        </div>
+    </div>
+    <div id="selector_search"></div>
+    <!--END selector-->
+    <!--BEGIN contact list-->
+   <!-- <div contact-list-chooser-directive
+         data-all-contacts="contactList"
+         data-is-check="isCheck"
+         data-click-user-callback="toggleUser"></div>-->
+
+    <div class="chooser" ng-class="{choose2: selectList.length >= 7}">
+        <div jquery-scrollbar id="J_ContactPickerScrollBody"  class="contacts scrollbar-dynamic">
+            <!--BEGIN star contact list-->
+            <div mm-repeat="item in contactList" data-height-calc="heightCalc" data-buffer-height="100" data-no-cache="true"
+                 mm-repeat-keyboard mm-repeat-keyboard-scroll-selector="#J_ContactPickerScrollBody" >
+                <h4 ng-if='item.type=="header"'  class="contact_title">{{item.text}}</h4>
+                <div ng-if='item.type!="header"'
+                     contact-item-chooser-directive
+                     data-user="item"
+                     data-is-check="isCheck"
+                     data-click-user-callback="toggleUser" ng-class="{active:item.UserName==current.UserName}"></div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!--END contact list-->
+</div>
+</script>
+<script type="text/ng-template" id="transpond.dialog.html">
+<div class="dialog_hd">
+    <h3 class="title">转发</h3>
+</div>
+<div class="dialog_bd" id="createChatRoomContainer">
+
+    <div  contact-picker data-init-list="initList" data-pick-config="pickConfig" data-select-list="selectedUsers"  >
+
+    </div>
+</div>
+<div class="dialog_ft" >
+    <a href="javascript:;" ng-click="send()" class="button_default" ng-class="{button_primary:selectedUsers.length&&selectedUsers.length<=200}">确定<span ng-if="selectedUsers.length">({{selectedUsers.length}})</span></a>
+  <!--  <a ng-if="selectedUsers.length && ngDialogData.isCreate" ng-click="create()" href="javascript:;" class="button_primary">确定<span ng-if="selectedUsers.length">({{selectedUsers.length}})</span></a>
+    <a ng-if="selectedUsers.length && ngDialogData.isAdd" ng-click="add()" href="javascript:;" class="button_primary">确定<span ng-if="selectedUsers.length">({{selectedUsers.length}})</span></a>-->
+</div>
+
+<div class="dialog-confirm" ng-show="comfirming">
+    <div class="user-container">
+        <div class="users">
+            <div class="user" ng-if="$index < 14" ng-repeat="user in selectedUsers">
+                <div class="avatar">
+                    <img class="img" mm-src="{{user.HeadImgUrl}}" alt="">
+                </div>
+                <span ng-bind-html="user.getDisplayName()"></span>
+            </div>
+            <div class="user" ng-if="selectedUsers.length>14">
+                <div class="more"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="info">
+        <div class="count">
+            共 <span class="num"> {{selectedUsers.length}} </span>个聊天        </div>
+        <div class="desc">
+            确定分别发送给他们？        </div>
+    </div>
+    <div class="buttons">
+        <div class="button" ng-click="cancel()">取消</div>
+        <div class="button button-primary" ng-click="ensure()">发送</div>
+    </div>
+
+</div>
+</script> 
+
+
+
+
+    <!--script-->
+    <script type="text/javascript">
+        (function(){
+            window.MMCgi = {
+                isLogin:!!""
+            };
+//            window.MMSource = {
+//                /*videoSwfPath:'/zh_CN/htmledition/v2/third_party/video-js-4.11.2/video-js.swf',*/
+//                copySwfPath:'./zh_CN/htmledition/v2/third_party/zeroclipboard-2.0.2/ZeroClipboard.swf',
+//                jplayerSwfPath:'/zh_CN/htmledition/v2/third_party/jPlayer-2.9.2/jquery.jplayer.swf'
+//
+//            };
+            window.MMDEV = location.host.indexOf("dev") > -1;
+        })();
+
+    </script>
+    <!--script-->
+    <script type="text/javascript" src="https://tajs.qq.com/stats?sId=43209744" charset="UTF-8"></script>
+<script>!function(){var n,t={};n=function(n,e){var i=arguments.length;if(i>1)t[n]=e;else if(1==i){if("object"!=typeof n)return t[n];for(var o in n)n.hasOwnProperty(o)&&(t[o]=n[o])}},"_"in window||(window._=n)}();_({"02d9819":"提示","0d2fc2c":"程序初始化失败，点击确认刷新页面","599d8df":"发送文件出错，请刷新后再试","8d521cc":"点击修改备注","5a97440":"我是","8d521cc":"点击修改备注","8d521cc":"点击修改备注","02d9819":"提示","f45a3d8":"添加好友失败","61e885c":"不允许发送空文件","9a7dbbc":"发送视频文件不允许超过 20MB","599d8df":"发送文件出错，请刷新后再试","76a7e04":"图片上传失败，请检查你的网络","82cf63d":"抱歉，截屏工具暂不支持64位操作系统下的IE浏览器。","112a5c0":"请检查你是否禁用了截屏插件。如果你还没安装截屏插件，点击确定安装。","c5795a7":"图片上传失败，请检查你的网络，","02d9819":"提示","f45a3d8":"添加好友失败","02d9819":"提示","0d42740":"创建群聊失败","02d9819":"提示","0d42740":"创建群聊失败","84e4fac":"取消置顶","3d43ff1":"置顶","1f9be6d":"修改群名","685739c":"关闭聊天","91382d9":"清屏","7068541":"查看详细资料","b5f1591":"发送消息","0bd10a8":"添加到通讯录","2305051":"撤回","2305051":"撤回","3b61c96":"引用","d9eb6f5":"「","83b6d34":"」","79d3abe":"复制","f26ef91":"下载","21e106f":"转发","2f4aadd":"删除","b3b6735":"最近聊天","938b111":"该消息网页版微信暂时不支持","a5627e8":"[图片]","b28dac0":"[语音]","4078104":"[视频]","1f94b1b":"[小视频]","80f56fb":"[发送了一个表情，请在手机上查看]","2242ac7":"[收到了一个表情，请在手机上查看]","e230fc1":"[动画表情]","fdaa3a3":"[收到一条视频/语音聊天消息，请在手机上查看]","0e23719":"[音乐]","4078104":"[视频]","4f20785":"[应用消息]","c4e04ee":"请在手机点击打开","e5b228c":"[链接]","6daeae3":"[文件]","0cdad09":"[收到一条微信转账消息，请在手机上查看]","c534fc3":"[收到一条优惠券消息，请在手机上查看]","8e94ca5":"我发起了位置共享，请在手机上查看","a41d576":"对方","a1f1299":"发起了位置共享，请在手机上查看","95afe20":"[收到一条扫商品消息，请在手机上查看]","355765a":"[收到一条商品消息，请在手机上查看]","9d7f4bb":"[收到一条表情分享消息，请在手机上查看]","e24e75c":"[微信红包]","ded861c":"撤回了一条消息","df1fd91":"你","ebeaf99":"想要将你加为朋友","ebeaf99":"想要将你加为朋友","9a2223f":"你推荐了","dd14577":"向你推荐了","809bb9d":"[表情]","df1fd91":"你","ded861c":"撤回了一条消息","df1fd91":"你","ded861c":"撤回了一条消息","6c2fc35":"微信团队","eb7ec65":"文件传输助手","0469c27":"腾讯新闻","a82c4c4":"朋友推荐消息","f13fb20":"星标好友","59d29a3":"好友","4b0ab7b":"群组","215feec":"公众号","2f521c5":"微信网页版","cfbf6f4":"微信","845ec73":"图片加载失败，请关闭后重试。","809bb9d":"[表情]","562d747":"周日","1603b06":"周一","b5a6a07":"周二","e60725e":"周三","170fc8e":"周四","eb79cea":"周五","2457513":"周六"});</script><script src="//res.wx.qq.com/a/wx_fed/webwx/res/static/vendor/vendor_8863a98.js"></script>
+<script src="//res.wx.qq.com/a/wx_fed/webwx/res/static/js/index_40649b7.js"></script></body>
+</html>
