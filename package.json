@@ -1,0 +1,31 @@
+{
+  "name": "tiny-wechat-robot",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">= v7.7.3"
+  },
+  "description": "a tiny wechat/weixin robot",
+  "main": "hijacked_wechat_index.js",
+  "scripts": {
+    "serve": "node http_static_server.js",
+    "wechat": "./node_modules/.bin/phantomjs phantomjs_wechat.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dongyuwei/tiny-wechat-robot.git"
+  },
+  "keywords": [
+    "wechat",
+    "weixin",
+    "robot"
+  ],
+  "author": "newdongyuwei@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dongyuwei/tiny-wechat-robot/issues"
+  },
+  "homepage": "https://github.com/dongyuwei/tiny-wechat-robot#readme",
+  "devDependencies": {
+    "phantomjs-prebuilt": "^2.1.14"
+  }
+}

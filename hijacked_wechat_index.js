@@ -31,7 +31,6 @@ function pingPongRobot (receivedMessage) {
 function replyTo (toUser, message) {
     requestAnimationFrame(function(){
         $('.chat_list .chat_item').each(function(){
-            console.log($(this).scope().chatContact.getDisplayName(), toUser.getDisplayName())
             if ($(this).scope().chatContact.UserName === toUser.UserName) {
                 $(this).click();
                 $('#editArea').html(message).trigger('input');
