@@ -5,9 +5,13 @@ function pingPongRobot (receivedMessage) {
     console.log('### reveived message, processing it ', JSON.stringify(receivedMessage, null, 3));
 
     var myName = $('.header .avatar').scope().account.UserName;
+    // isRoomContact
     if (receivedMessage.FromUserName !== myName) {
         var content = receivedMessage.Content.trim().toLowerCase();
         var toUser = window._contacts[receivedMessage.FromUserName];
+        if (toUser.isRoomContact()) {
+            content = content.split(':<br/>')[1];
+        }
         switch (content) {
             case 'ping':
                 replyTo(toUser, 'pong');
@@ -25,25 +29,16 @@ function pingPongRobot (receivedMessage) {
 }
 
 function replyTo (toUser, message) {
-    $('#search_bar .frm_search').val(toUser.NickName).trigger('input');
-
-    function loopCheck(){
-        if ($('.contacts.scrollbar-dynamic.scroll-content  .contact_item.on').length === 0) {
-            return setTimeout(loopCheck, 10);
-        }
-
-        $('.contacts.scrollbar-dynamic.scroll-content  .contact_item.on').trigger('click');
-        
-        var scope = $('#chatArea').scope();
-        scope.$apply(function(){
-            scope.currentContact = toUser;
+    requestAnimationFrame(function(){
+        $('.chat_list .chat_item').each(function(){
+            console.log($(this).scope().chatContact.getDisplayName(), toUser.getDisplayName())
+            if ($(this).scope().chatContact.UserName === toUser.UserName) {
+                $(this).click();
+                $('#editArea').html(message).trigger('input');
+                $('.action .btn.btn_send').click();
+            }
         });
-
-        $('#editArea').html(message).trigger('input');
-        $('.action .btn.btn_send').click();
-    }
-
-    loopCheck();
+    });
 }
 
 ///====================== end of injected code =============================///
