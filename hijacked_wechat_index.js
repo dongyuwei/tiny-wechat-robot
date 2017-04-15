@@ -2,29 +2,27 @@
 console.log('### wechat index js hijacked ###');
 
 (function injectCodeToAngularApp() {
-    let angular = window.angular;
-    let bootstrap = angular.bootstrap;
-    Object.defineProperty(angular, 'bootstrap', {
-        get: () => function (element, moduleNames) {
-            const ModuleName = 'webwxApp';
-            angular.module(ModuleName).run(['$rootScope', ($rootScope) => {
-                $rootScope.$on('root:pageInit:success', function () {
-                    $rootScope.$on("message:add:success", function (e, oMessage) {
-                        conversationLogger(oMessage);
-                    });
-
-                    var injector = angular.element(document).injector();
-                    var chatFactory = injector.get('chatFactory');
-                    var messageProcess = chatFactory.messageProcess;
-                    chatFactory.messageProcess = function (oMessage) {
-                        messageProcess.call(chatFactory, oMessage);
-                        pingPongRobot(oMessage);
-                    }
+    var angular = window.angular;
+    var originalBootstrap = angular.bootstrap;
+    angular.bootstrap = function (element, moduleNames) {
+        var ModuleName = 'webwxApp';
+        angular.module(ModuleName).run(['$rootScope', function ($rootScope) {
+            $rootScope.$on('root:pageInit:success', function () {
+                $rootScope.$on("message:add:success", function (e, oMessage) {
+                    conversationLogger(oMessage);
                 });
-            }]);
-            return bootstrap.apply(angular, arguments);
-        }
-    });
+
+                var injector = angular.element(document).injector();
+                var chatFactory = injector.get('chatFactory');
+                var originalMessageProcess = chatFactory.messageProcess;
+                chatFactory.messageProcess = function (oMessage) {
+                    originalMessageProcess.call(chatFactory, oMessage);
+                    pingPongRobot(oMessage);
+                }
+            });
+        }]);
+        return originalBootstrap.apply(angular, arguments);
+    }
 
     function conversationLogger(oMessage){
         console.log('### new conversation message: ', JSON.stringify(oMessage, null, 3));
