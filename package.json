@@ -5,7 +5,6 @@
     "node": ">= v7.7.3"
   },
   "description": "a tiny wechat/weixin robot",
-  "main": "hijacked_wechat_index.js",
   "scripts": {
     "serve": "node http_static_server.js",
     "wechat": "./node_modules/.bin/phantomjs phantomjs_wechat.js"
