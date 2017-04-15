@@ -1,5 +1,6 @@
 const http = require('http');
 const fs = require('fs');
+const path = require('path');
 
 const server = http.createServer((req, res) => {
     console.log(req.url);
@@ -8,8 +9,8 @@ const server = http.createServer((req, res) => {
             'Cache-Control': 'no-cache',
             'Content-Type': 'application/x-javascript; charset=utf-8'}
         );
-        res.write(fs.readFileSync('./wechat_injection.js', 'utf-8'));
-        res.end(fs.readFileSync('./hijacked_wechat_index.js', 'utf-8'));
+        res.write(fs.readFileSync(path.join(__dirname, 'wechat_injection.js'), 'utf-8'));
+        res.end(fs.readFileSync(path.join(__dirname, 'wechat_index.js'), 'utf-8'));
     } else {
         res.end(req.url);
     }

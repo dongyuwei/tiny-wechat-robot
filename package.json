@@ -6,8 +6,8 @@
   },
   "description": "a tiny wechat/weixin robot",
   "scripts": {
-    "serve": "node http_static_server.js",
-    "wechat": "./node_modules/.bin/phantomjs phantomjs_wechat.js"
+    "serve": "node ./src/http_static_server.js",
+    "wechat": "./node_modules/.bin/phantomjs ./src/phantomjs_wechat.js"
   },
   "repository": {
     "type": "git",
