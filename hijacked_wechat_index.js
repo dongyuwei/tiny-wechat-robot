@@ -1,45 +1,74 @@
 ///====================== start of injected code =============================\\\
 console.log('### wechat index js hijacked ###');
 
-function pingPongRobot (receivedMessage) {
-    console.log('### reveived message, processing it ', JSON.stringify(receivedMessage, null, 3));
+(function injectCodeToAngularApp() {
+    let angular = window.angular;
+    let bootstrap = angular.bootstrap;
+    Object.defineProperty(angular, 'bootstrap', {
+        get: () => function (element, moduleNames) {
+            const ModuleName = 'webwxApp';
+            angular.module(ModuleName).run(['$rootScope', ($rootScope) => {
+                $rootScope.$on('root:pageInit:success', function () {
+                    $rootScope.$on("message:add:success", function (e, oMessage) {
+                        conversationLogger(oMessage);
+                    });
 
-    var myName = $('.header .avatar').scope().account.UserName;
-    // isRoomContact
-    if (receivedMessage.FromUserName !== myName) {
-        var content = receivedMessage.Content.trim().toLowerCase();
-        var toUser = window._contacts[receivedMessage.FromUserName];
-        if (toUser.isRoomContact()) {
-            content = content.split(':<br/>')[1];
+                    var injector = angular.element(document).injector();
+                    var chatFactory = injector.get('chatFactory');
+                    var messageProcess = chatFactory.messageProcess;
+                    chatFactory.messageProcess = function (oMessage) {
+                        messageProcess.call(chatFactory, oMessage);
+                        pingPongRobot(oMessage);
+                    }
+                });
+            }]);
+            return bootstrap.apply(angular, arguments);
         }
-        switch (content) {
-            case 'ping':
-                replyTo(toUser, 'pong');
-                break;
-            case 'pingping':
-                replyTo(toUser, 'pongpong');
-                break;
-            case 'pingpingping':
-                replyTo(toUser, 'pongpongpong');
-                break;
-            default:
-                break;
+    });
+
+    function conversationLogger(oMessage){
+        console.log('### new conversation message: ', JSON.stringify(oMessage, null, 3));
+    }
+
+    function pingPongRobot (receivedMessage) {
+        console.log('### message reveived, processing it ', JSON.stringify(receivedMessage, null, 3));
+
+        var myName = $('.header .avatar').scope().account.UserName;
+        if (receivedMessage.FromUserName !== myName) {
+            var content = receivedMessage.Content.trim().toLowerCase();
+            var toUser = window._contacts[receivedMessage.FromUserName];
+            if (toUser.isRoomContact()) {
+                content = content.split(':<br/>')[1];
+            }
+            switch (content) {
+                case 'ping':
+                    replyTo(toUser, 'pong');
+                    break;
+                case 'pingping':
+                    replyTo(toUser, 'pongpong');
+                    break;
+                case 'pingpingping':
+                    replyTo(toUser, 'pongpongpong');
+                    break;
+                default:
+                    break;
+            }
         }
     }
-}
 
-function replyTo (toUser, message) {
-    requestAnimationFrame(function(){
-        $('.chat_list .chat_item').each(function(){
-            if ($(this).scope().chatContact.UserName === toUser.UserName) {
-                $(this).click();
-                $('#editArea').html(message).trigger('input');
-                $('.action .btn.btn_send').click();
-            }
+    function replyTo (toUser, message) {
+        requestAnimationFrame(function(){
+            $('.chat_list .chat_item').each(function(){
+                if ($(this).scope().chatContact.UserName === toUser.UserName) {
+                    $(this).click();
+                    $('#editArea').html(message).trigger('input');
+                    $('.action .btn.btn_send').click();
+                }
+            });
         });
-    });
-}
+    }
 
+})();
 ///====================== end of injected code =============================///
 
 webpackJsonp([1], [function(e, exports, t) {
@@ -2189,7 +2218,6 @@ webpackJsonp([1], [function(e, exports, t) {
                         return a.length ? a[a.length - 1] : {}
                     },
                     addChatMessage: function(e) {
-                        // console.log('### new conversation message: ', JSON.stringify(e, null, 3))
                         if (e) {
                             var t = this,
                                 a = (e.FromUserName, e.ToUserName, _chatMessages[e.MMPeerUserName] || (_chatMessages[e.MMPeerUserName] = []));
@@ -2239,9 +2267,6 @@ webpackJsonp([1], [function(e, exports, t) {
                         return this.setCurrentUnread(e, 0), a
                     },
                     messageProcess: function(e) {
-                        ///-------------------------\\\
-                        pingPongRobot(e);
-                        ///-------------------------///
                         var t = this,
                             a = contactFactory.getContact(e.FromUserName, "", !0);
                         if (!a || a.isMuted() || a.isSelf() || a.isShieldUser() || a.isBrandContact() || titleRemind.increaseUnreadMsgNum(), e.MMPeerUserName = t._getMessagePeerUserName(e), e.MsgType == confFactory.MSGTYPE_STATUSNOTIFY) return void t._statusNotifyProcessor(e);
