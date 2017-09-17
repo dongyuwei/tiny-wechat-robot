@@ -30,30 +30,31 @@ console.log('### wechat index js hijacked ###');
     function pingPongRobot (receivedMessage) {
         console.log('### message reveived, processing it ', JSON.stringify(receivedMessage, null, 3));
 
+        var content = receivedMessage.Content.trim().toLowerCase();
+        var toUser = window._contacts[receivedMessage.FromUserName];
+        if (toUser.isRoomContact()) {
+            content = content.split(':<br/>')[1];
+        }
+
         var myName = $('.header .avatar').scope().account.UserName;
-        if (receivedMessage.FromUserName !== myName) {
-            var content = receivedMessage.Content.trim().toLowerCase();
-            var toUser = window._contacts[receivedMessage.FromUserName];
-            if (toUser.isRoomContact()) {
-                content = content.split(':<br/>')[1];
-            }
-            switch (content) {
-                case 'ping':
-                    replyTo(toUser, 'pong');
-                    break;
-                case 'pingping':
-                    replyTo(toUser, 'pongpong');
-                    break;
-                case 'pingpingping':
-                    replyTo(toUser, 'pongpongpong');
-                    break;
-                default:
-                    break;
-            }
+        var toSelf = receivedMessage.FromUserName === myName;
+        var reply = toSelf ? replyToSelf : replyTo;
+        switch (content) {
+            case 'ping':
+                reply('pong', toUser);
+                break;
+            case 'pingping':
+                reply('pongpong', toUser);
+                break;
+            case 'pingpingping':
+                reply('pongpongpong', toUser);
+                break;
+            default:
+                break;
         }
     }
 
-    function replyTo (toUser, message) {
+    function replyTo (message, toUser) {
         requestAnimationFrame(function(){
             $('.chat_list .chat_item').each(function(){
                 if ($(this).scope().chatContact.UserName === toUser.UserName) {
@@ -62,6 +63,16 @@ console.log('### wechat index js hijacked ###');
                     $('.action .btn.btn_send').click();
                 }
             });
+        });
+    }
+
+    function replyToSelf (message) {
+        console.log('replyToSelf', message);
+        requestAnimationFrame(function(){
+            $('.header .avatar img').click();
+            $('.profile_mini .web_wechat_tab_launch-chat').click();
+            $('#editArea').html(message).trigger('input');
+            $('.action .btn.btn_send').click();
         });
     }
 
