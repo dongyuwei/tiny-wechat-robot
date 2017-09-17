@@ -13,14 +13,6 @@ const server = http.createServer((req, res) => {
         return res.end(fs.readFileSync(path.join(__dirname, 'wechat_index.js'), 'utf-8'));
     } 
 
-    // if (req.url.indexOf('/vendor_snapshot.js') !== -1) {
-    //     res.writeHead(200, {
-    //         'Cache-Control': 'no-cache',
-    //         'Content-Type': 'application/x-javascript; charset=utf-8'}
-    //     );
-    //     return res.end(fs.readFileSync(path.join(__dirname, '../_original_material/vendor_8863a98.js'), 'utf-8'));
-    // }
-
     return res.end(req.url);
 });
 

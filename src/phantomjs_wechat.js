@@ -13,9 +13,6 @@ page.onResourceRequested = function(requestData, networkRequest) {
     if (url.match(/static\/js\/index_(.+)\.js$/)) {
         networkRequest.changeUrl('http://127.0.0.1:8000/hijacked_wechat_index.js?v=' + new Date().getTime());
     }
-    // if (url.match(/static\/js\/vendor_(.+)\.js$/)) {
-    //     networkRequest.changeUrl('http://127.0.0.1:8000/vendor_snapshot.js?v=' + new Date().getTime());
-    // }
 
     if (url.indexOf('/qrcode/') !== -1) {
         console.info("### qrcode: ", url);
