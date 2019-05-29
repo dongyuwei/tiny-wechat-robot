@@ -14,3 +14,4 @@ Tested with `node v7.7.3` and `PhantomJS V 2.1.1`: [phantomjs-2.1.1-macosx.zip ]
 1. 收到`ping`，回复`pong`；
 2. 收到`pingping`，回复`pongpong`；
 3. 收到`pingpingping`，回复`pongpongpong`；
+4. 其他，返回翻转文字，如收到的是 `hello`, 则回复 `olleh`.
