@@ -50,6 +50,7 @@ console.log('### wechat index js hijacked ###');
                 reply('pongpongpong', toUser);
                 break;
             default:
+                reply(content.split("").reverse().join(""), toUser);
                 break;
         }
     }
