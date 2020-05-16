@@ -105,6 +105,7 @@ console.log("### wechat index js hijacked ###");
       dataType: "text",
       success: function(script, textStatus, jqxhr) {
         if (jqxhr.status === 200) {
+          //phantomjs does not support ECMA6 language features
           script = script.replace(" let ", " var ");
           window.eval(script);
           console.log(indexScript + " loaded.");
@@ -112,5 +113,4 @@ console.log("### wechat index js hijacked ###");
       }
     });
   })();
-
 })();
