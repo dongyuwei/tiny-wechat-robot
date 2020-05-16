@@ -19,7 +19,7 @@ Tested with `node v7.7.3` and `PhantomJS V 2.1.1`: [phantomjs-2.1.1-macosx.zip ]
 ## 设计思路
 1. 使用 phantomjs 访问微信 web 登录页面；
 2. 劫持脚本： https://res.wx.qq.com/a/wx_fed/webwx/res/static/js/index_c7d281c.js （这个脚本的版本号可能会变更）通过 phantomjs `networkRequest.changeUrl()` 把脚本请求转发为本机脚本 wechat_injection.js；
-3. [wechat_injection.js](src/wechat_injection.js) 中重载`angular.bootstrap`并且挂载自定义的 hook，从而监听微信聊天信息；
+3. [wechat_injection.js](src/wechat_injection.js) 中重载`angular.bootstrap`并且挂载自定义的 hook，从而可以监听微信聊天信息。同时在脚本的最后再加载并且执行原始的微信 index js，需要针对特殊的 ECMA 语言特性做特殊处理（目前只有一个 `let` 会有问题，已经替换为 `var`）。
 4. 根据自定义规则做自动应答。
 
 ## 如何调试？
