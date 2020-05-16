@@ -8,16 +8,18 @@ page.onConsoleMessage = function(msg) {
     console.log(msg);
 };
 
+var redirected = {};
 page.onResourceRequested = function(requestData, networkRequest) {
     var url = requestData.url;
-    console.log("request ", url)
-    if (url.match(/static\/js\/index_(.+)\.js$/)) {
+    if (!redirected[url] && url.match(/wx.qq.com\/a\/wx_fed\/webwx\/res\/static\/js\/index_(.+)\.js$/)) {
+        redirected[url] = true;
+        console.log('>>> onResourceRequested', url)
         networkRequest.changeUrl('http://127.0.0.1:8000/hijacked_wechat_index.js?v=' + new Date().getTime());
     }
 
     if (url.indexOf('/qrcode/') !== -1) {
-        console.info("### qrcode: ", url);
-        console.info('### 请用手机微信扫码登陆。### ');
+        console.info('\n############################################################################');
+        console.info('1. 请使用浏览器打开二维码图片 ' + url +  '\n2. 用手机微信扫码登陆。');
     }
 };
 
@@ -32,7 +34,6 @@ page.onError = function(msg, trace) {
     console.error(msgStack.join('\n'));
 };
 
-var indexUrl = 'https://wx.qq.com/';
-page.open(indexUrl, function(status) {
-    console.log('Status: ' + status + ' to load ' + indexUrl);
+page.open('https://wx2.qq.com/?&lang=en_US', function(status) {
+    console.log('Status: ' + status);
 });
