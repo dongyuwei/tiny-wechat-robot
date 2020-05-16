@@ -96,18 +96,21 @@ console.log("### wechat index js hijacked ###");
     });
   }
 
-  var indexScript =
-    "https://res.wx.qq.com/a/wx_fed/webwx/res/static/js/index_c7d281c.js";
+  (function loadOriginalScript() {
+    var indexScript =
+      "https://res.wx.qq.com/a/wx_fed/webwx/res/static/js/index_c7d281c.js";
 
-  $.ajax({
-    url: indexScript,
-    dataType: "text",
-    success: function(script, textStatus, jqxhr) {
-      if (jqxhr.status === 200) {
-        script = script.replace(" let ", " var ");
-        window.eval(script);
-        console.log(indexScript + " loaded.");
+    $.ajax({
+      url: indexScript,
+      dataType: "text",
+      success: function(script, textStatus, jqxhr) {
+        if (jqxhr.status === 200) {
+          script = script.replace(" let ", " var ");
+          window.eval(script);
+          console.log(indexScript + " loaded.");
+        }
       }
-    }
-  });
+    });
+  })();
+
 })();
