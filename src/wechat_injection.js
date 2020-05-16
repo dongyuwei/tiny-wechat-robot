@@ -21,7 +21,8 @@ console.log('### wechat index js hijacked ###');
             });
         }]);
         return originalBootstrap.apply(angular, arguments);
-    }
+    };
+
 
     function conversationLogger(oMessage){
         console.log('### new conversation message: ', JSON.stringify(oMessage, null, 3));
@@ -77,4 +78,9 @@ console.log('### wechat index js hijacked ###');
         });
     }
 
+    $.getScript("https://res.wx.qq.com/a/wx_fed/webwx/res/static/js/index_c7d281c.js", function( data, textStatus, jqxhr ) {
+        if(jqxhr.status === 200 ) {
+            console.log( "original index script loaded" );
+        }
+      });
 })();

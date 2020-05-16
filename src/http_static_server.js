@@ -9,8 +9,7 @@ const server = http.createServer((req, res) => {
             'Cache-Control': 'no-cache',
             'Content-Type': 'application/x-javascript; charset=utf-8'}
         );
-        res.write(fs.readFileSync(path.join(__dirname, 'wechat_injection.js'), 'utf-8'));
-        return res.end(fs.readFileSync(path.join(__dirname, 'wechat_index.js'), 'utf-8'));
+        return res.end(fs.readFileSync(path.join(__dirname, 'wechat_injection.js'), 'utf-8'));
     } 
 
     return res.end(req.url);

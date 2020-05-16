@@ -10,6 +10,7 @@ page.onConsoleMessage = function(msg) {
 
 page.onResourceRequested = function(requestData, networkRequest) {
     var url = requestData.url;
+    console.log("request ", url)
     if (url.match(/static\/js\/index_(.+)\.js$/)) {
         networkRequest.changeUrl('http://127.0.0.1:8000/hijacked_wechat_index.js?v=' + new Date().getTime());
     }
@@ -31,6 +32,7 @@ page.onError = function(msg, trace) {
     console.error(msgStack.join('\n'));
 };
 
-page.open('https://wx.qq.com/', function(status) {
-    console.log('Status: ' + status);
+var indexUrl = 'https://wx.qq.com/';
+page.open(indexUrl, function(status) {
+    console.log('Status: ' + status + ' to load ' + indexUrl);
 });
