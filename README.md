@@ -15,3 +15,13 @@ Tested with `node v7.7.3` and `PhantomJS V 2.1.1`: [phantomjs-2.1.1-macosx.zip ]
 2. 收到`pingping`，回复`pongpong`；
 3. 收到`pingpingping`，回复`pongpongpong`；
 4. 其他，不做特殊处理.
+
+## 设计思路
+1. 使用 phantomjs 访问微信 web 登录页面；
+2. 劫持脚本： https://res.wx.qq.com/a/wx_fed/webwx/res/static/js/index_c7d281c.js（这个脚本的版本号可能会变更）通过 phantomjs `networkRequest.changeUrl()` 把脚本请求转发为本机脚本 wechat_injection.js；
+3. [wechat_injection.js](src/wechat_injection.js) 中重载`angular.bootstrap`并且挂载自定义的 hook，从而监听微信聊天信息；
+4. 根据自定义规则做自动应答。
+
+## 如何调试？
+使用任意 proxy 代理软件，如 Charles Proxy，或者chrome浏览器插件[trumpet](https://chrome.google.com/webstore/detail/trumpet/cflekmkldaldnelemkkldoaedapbkmog) 转发资源请求。
+- 需要注意 [wechat_injection.js](src/wechat_injection.js) 中 `loadOriginalScript()` 在 Chrome 中会遇到跨域请求限制问题，可以直接修改代码，把原始 script 下载后添加到该文件中即可。 
