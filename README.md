@@ -10,8 +10,8 @@
 Tested with `node v7.7.3` and `PhantomJS V 2.1.1`: [phantomjs-2.1.1-macosx.zip ](https://npm.taobao.org/mirrors/phantomjs/phantomjs-2.1.1-macosx.zip) or [phantomjs-2.1.1-linux-x86_64.tar.bz2  ](https://npm.taobao.org/mirrors/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2)
 
 ## 核心功能
-目前就是一个最简化的`ping-pong`应答机器人 (核心代码是 `src/wechat_injection.js` ): 
+目前就是一个最简化的`ping-pong`应答机器人 (核心代码是 `src/wechat_injection.js` )，给`当前登录用户`发消息，则: 
 1. 收到`ping`，回复`pong`；
 2. 收到`pingping`，回复`pongpong`；
 3. 收到`pingpingping`，回复`pongpongpong`；
-4. 其他，返回翻转文字，如收到的是 `hello`, 则回复 `olleh`.
+4. 其他，不做特殊处理.
