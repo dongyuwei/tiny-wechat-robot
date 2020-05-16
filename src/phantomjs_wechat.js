@@ -14,7 +14,12 @@ page.onResourceRequested = function(requestData, networkRequest) {
     if (!redirected[url] && url.match(/wx.qq.com\/a\/wx_fed\/webwx\/res\/static\/js\/index_(.+)\.js$/)) {
         redirected[url] = true;
         console.log('>>> onResourceRequested', url)
-        networkRequest.changeUrl('http://127.0.0.1:8000/hijacked_wechat_index.js?v=' + new Date().getTime());
+        networkRequest.changeUrl(
+          "http://127.0.0.1:8000/hijacked_wechat_index.js?v=" +
+            new Date().getTime() +
+            "&original=" +
+            encodeURIComponent(url)
+        );
     }
 
     if (url.indexOf('/qrcode/') !== -1) {

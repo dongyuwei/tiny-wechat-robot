@@ -90,18 +90,17 @@ console.log("### wechat index js hijacked ###");
   }
 
   (function loadOriginalScript() {
-    var indexScript =
-      "https://res.wx.qq.com/a/wx_fed/webwx/res/static/js/index_c7d281c.js";
+    var originalScript = window.wechatOriginalScript;
 
     $.ajax({
-      url: indexScript,
+      url: originalScript,
       dataType: "text",
       success: function(script, textStatus, jqxhr) {
         if (jqxhr.status === 200) {
           //phantomjs does not support ECMA6 language features
           script = script.replace(" let ", " var ");
           window.eval(script);
-          console.log(indexScript + " loaded.");
+          console.log("original script " + originalScript + " loaded.");
         }
       }
     });
